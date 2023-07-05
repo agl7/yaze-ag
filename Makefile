@@ -11,12 +11,11 @@ PREFIX        = /usr/local
 BINDIR	      = $(PREFIX)/bin
 MANDIR	      = $(PREFIX)/share/man/man1
 LIBDIR	      = $(PREFIX)/lib/yaze
-SHARDIR	      = $(PREFIX)/share/yaze
 DSKDIR        = $(LIBDIR)/disks
 DOCDIR        = $(LIBDIR)/doc
 DOCHTMLDIR    = $(LIBDIR)/doc_html
 
-OPTIMIZE	= -O3 -march=native -mtune=native
+OPTIMIZE	= -O3
 
 # -DUSE_GNU_READLINE for command recall/editing and filename completion
 # -DBGii_BUG works around a problem in Backgrounder II
@@ -62,9 +61,9 @@ OPTIMIZE	= -O3 -march=native -mtune=native
 #
 # --
 # solaris2, freebsd and cygwin needs -D__EXTENSIONS__
-# linux needs -D_DEFAULT_SOURCE -D_POSIX_SOURCE
+# linux needs -D_DEFAULT_SOURCE
 #
-OPTIONS	= -D_DEFAULT_SOURCE -D_POSIX_SOURCE -DBIOS -DMMU -DBOOTSYS -DMULTIO # -DSHOWDRV
+OPTIONS	= -D_DEFAULT_SOURCE -DBIOS -DMMU -DBOOTSYS -DMULTIO # -DSHOWDRV
 
 # Link with CP/M BIOS support,
 YAZE_OBJS     = yaze.o mem_mmu.o simz80.o simz80_wts.o ytimer.o ybios.o \
@@ -168,34 +167,35 @@ yaze_bin:	yaze.sh $(YAZE_OBJS)
 keytest:	$(KT_OBJS)
 		$(CC) $(CFLAGS) $(KT_OBJS) -o $@
 
-#simz80.c:	simz80.pl
-#		rm -f simz80.c
-#		perl -w simz80.pl >simz80.c
-#		chmod a-w simz80.c
+simz80.c:	simz80.pl
+		rm -f simz80.c
+		perl -w simz80.pl >simz80.c
+		chmod a-w simz80.c
 
 cdm:		cdm.o
 		$(CC) $(CFLAGS) cdm.o $(LIBS) -o $@
 
 install:	all
-		mkdir -p $(LIBDIR)
-		mkdir -p $(MANDIR)
-		$(INSTALL) -s -c -m 755 yaze_bin $(BINDIR)
-		$(INSTALL) -s -c -m 755 cdm $(BINDIR)
-		$(INSTALL) -c -m 755 yaze $(BINDIR)
-		ln -f -s ./yaze $(BINDIR)/cpm
-		ln -f -s ./yaze $(BINDIR)/z80
-		$(INSTALL) -c -m 644 yaze-cpm3.boot $(LIBDIR)
-		$(INSTALL) -c -m 644 yaze.boot $(LIBDIR)
-		$(INSTALL) -c -m 644 m2.ktt $(LIBDIR)
-		$(INSTALL) -c -m 644 sample.ktt $(LIBDIR)
-		$(INSTALL) -c -m 644 yaze.ktt $(LIBDIR)
-		$(INSTALL) -c -m 644 yaze.1 $(MANDIR)
-		$(INSTALL) -c -m 644 cdm.1 $(MANDIR)
-		$(INSTALL) -c -m 644 cpm.1 $(MANDIR)
-		$(INSTALL) -c -m 644 z80.1 $(MANDIR)
-		/bin/sh install_disks.sh $(DSKDIR)
-		# /bin/sh install_doc.sh $(DOCDIR)
-		/bin/sh install_doc_html.sh $(DOCHTMLDIR)
+		mkdir -p $(DESTDIR)$(LIBDIR)
+		mkdir -p $(DESTDIR)$(MANDIR)
+		mkdir -p $(DESTDIR)$(MANDIR)
+		$(INSTALL) -s -c -m 755 yaze_bin $(DESTDIR)$(BINDIR)
+		$(INSTALL) -s -c -m 755 cdm $(DESTDIR)$(BINDIR)
+		$(INSTALL) -c -m 755 yaze $(DESTDIR)$(BINDIR)
+		ln -f -s ./yaze $(DESTDIR)$(BINDIR)/cpm
+		ln -f -s ./yaze $(DESTDIR)$(BINDIR)/z80
+		$(INSTALL) -c -m 644 yaze-cpm3.boot $(DESTDIR)$(LIBDIR)
+		$(INSTALL) -c -m 644 yaze.boot $(DESTDIR)$(LIBDIR)
+		$(INSTALL) -c -m 644 m2.ktt $(DESTDIR)$(LIBDIR)
+		$(INSTALL) -c -m 644 sample.ktt $(DESTDIR)$(LIBDIR)
+		$(INSTALL) -c -m 644 yaze.ktt $(DESTDIR)$(LIBDIR)
+		$(INSTALL) -c -m 644 yaze.1 $(DESTDIR)$(MANDIR)
+		$(INSTALL) -c -m 644 cdm.1 $(DESTDIR)$(MANDIR)
+		$(INSTALL) -c -m 644 cpm.1 $(DESTDIR)$(MANDIR)
+		$(INSTALL) -c -m 644 z80.1 $(DESTDIR)$(MANDIR)
+		/bin/sh install_disks.sh $(DESTDIR)$(DSKDIR)
+		/bin/sh install_doc.sh $(DESTDIR)$(DOCDIR)
+		/bin/sh install_doc_html.sh $(DESTDIR)$(DOCHTMLDIR)
 
 md5:		$(DISTRIB)
 		(P=`pwd`; D=`basename $$P`; \
