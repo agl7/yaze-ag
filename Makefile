@@ -11,6 +11,7 @@ PREFIX        = /usr/local
 BINDIR	      = $(PREFIX)/bin
 MANDIR	      = $(PREFIX)/share/man/man1
 LIBDIR	      = $(PREFIX)/lib/yaze
+SHARDIR	      = $(PREFIX)/share/yaze
 DSKDIR        = $(LIBDIR)/disks
 DOCDIR        = $(LIBDIR)/doc
 DOCHTMLDIR    = $(LIBDIR)/doc_html
@@ -60,7 +61,7 @@ OPTIMIZE	= -O3
 #	    was neccessary because yaze-ag crashes.
 #
 # --
-# solaris2, freebsd and cygwin needs -D__EXTENSIONS__
+# solaris2, freebsd and cygwin needs 
 # linux needs -D_DEFAULT_SOURCE
 #
 OPTIONS	= -D_DEFAULT_SOURCE -DBIOS -DMMU -DBOOTSYS -DMULTIO # -DSHOWDRV
