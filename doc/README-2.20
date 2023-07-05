@@ -1,0 +1,64 @@
+Yet Another Z80 Emulator by AG (yaze-ag-2.20)
+=============================================
+
+yaze-ag-2.20.tar.gz is the final release of version 2.20 with the extension
+to run also under the cygwin environment under windows.
+
+yaze-ag-2.20 runs under:	Solaris (Sparc)
+				Linux
+				FreeBSD
+				Cygwin (Windows) (since V2.01)
+				MacOS-X
+
+yaze-ag-2.20 is a further developement of yaze-1.10.
+
+How you install is described in INSTALL-2.20 !!!
+
+
+What is YAZE-AG?
+
+YAZE-AG is an excellent Z80 emulator, written in ANSI C, that works on many
+Unix architectures like Solaris, OSF, FreeBSD, Linux, Mac-OS-X and the cygwin
+environment (Windows). It is fast, emulates undocumented opcodes, and passes
+instruction regression tests against real Z80 hardware.
+
+| NEW in version 2 is the emulated Memory Management Unit (MMU) and the BIOS
+| which supports CP/M 3.1 (or ZPM3 of Simeon Cran which is used in yaze-ag).
+
+Yaze-ag-2.20 is a final release and I am thinking this version runs quite
+stable. All known bugs are solved which are described under "Fixed Bugs" in
+yaze-ag.doc (or yaze-ag_doc.html).
+
+There are new features (against version 1.10) which are described under
+"FEATURES" in yaze-ag.doc too.
+
+"Mounting directories" in yaze-ag.doc describes the special feature to import
+directories into the emulator by connecting them to CP/M drives. That way
+you can easily import files into the emulator.
+
+The other way to export/import files out/into the emulator is the "cdm"
+utility (CP/M disk manager) (see man page cdm.1 or cdm(1)).
+
+
+If you find an error or you miss a feature so feel free and send an email
+to me.
+
+You will find yaze-ag-2.20 under
+
+	http://yaze-ag.de/
+
+	  it's a redirect to
+
+	http://www.mathematik.uni-ulm.de/users/ag/yaze-ag/
+
+	ftp://ag-yaze:yaze@xylopia-upload.mathematik.uni-ulm.de
+
+Have a look also to INSTALL-2.20, yaze.doc, yaze-ag.doc, the README's, yaze.1
+(man yaze) and cdm.1 (man cdm).
+
+08 June 2008
+Andreas Gerlich     
+(University of Ulm, Germany)
+
+only text emails please: yaze-ag (at) z80.de (SPAM-Account)
+

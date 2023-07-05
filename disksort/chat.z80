@@ -1,0 +1,85 @@
+;--------------------------------------------------------
+; chat
+;
+; Yet aAnother program to test communications cables and
+; software setup.  This one just sends whatever is typed
+; at the console to the the auxiliary display and echoes
+; anything that comes back onto the console.
+;
+; The program can be terminated from either end with
+; repeated pressings of the ESC key.
+;--------------------------------------------------------
+	.z80
+auxist	equ	7
+auxin	equ	3
+auxout	equ	4
+conin	equ	1
+conist	equ	11
+coniod	equ	6
+cpm	equ	5
+esc	equ	27
+cr	equ	13
+lf	equ	10
+
+auxstat	equ	0		; True to see an indicator when there is 
+				; something available on auxin:
+
+bdos	macro	fn
+	ld	c,fn
+	call	cpm
+	or	a
+	endm
+
+	aseg
+	org	100h
+
+chkcon:
+	bdos	conist		; Finish if an ESC has been
+	jr	z,chkaux	; entered at the console
+	ld	e,-1
+	bdos	coniod		; Get character without echo
+	ld	e,a		; Save it for output
+	jr	z,chkaux	; Nothing received ... check auxin
+	push	af		; Save a copy
+	call	finis		; Finish if 3 ESCs are seen
+	bdos	auxout		; Send it to the auxiliary device
+	pop	af		; What was it?
+	cp	cr		; Carriage return?
+	jr	nz,chkaux	; Carry on if not
+	ld	e,lf		; but send LF after CR
+	bdos	auxout
+chkaux:
+	bdos	auxist		; Is there something from the auxiliary input?
+	jr	z,chkcon	; No, go back to check the console
+    if auxstat
+	ld	e,'|'
+	bdos	coniod
+    endif
+	bdos	auxin		; Yes, fetch the character
+	ld	e,a		; Character to E for transmission
+	call	finis		; Finish if 3 ESCs are seen
+	bdos	coniod		; Echo the received character at the console
+	jr	chkcon		; Loop back to check the console input
+
+; Check to see if three consecutive ESC characters have been seen from
+; either end of the communications channel.
+
+finis:
+	ld	e,a		; Save input in E for transmission
+	ld	hl,escapes	; Point at number of escapes seen
+	cp	esc		; Is this one an escape?
+	jr	z,check3	; Yes - check count
+	xor	a		; No  - clear count
+	ld	(hl),a
+	ret
+check3:
+	inc	(hl)		; Update counter
+	ld	a,(hl)
+	cp	3
+	ret	c
+	rst	0
+
+escapes:
+	defb	0
+
+	end

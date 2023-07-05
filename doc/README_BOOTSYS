@@ -1,0 +1,84 @@
+My english is not so good, I hope you understand what I write here.
+---
+See also yaze-ag.doc chapter "4. Some words to BOOTSYS"
+---
+
+What is BOOTSYS?
+================
+
+The BOOTSYS utility relocates and places the resident and banked (if present)
+part in CPM3.SYS to their right places into memory and starts CP/M 3.1.
+
+Here is a part of the source of bootsys.z80:
+
+        title   'BOOTSYS - CPM3.SYS 1.00'
+        subttl  Copyright (C) 2000 Andreas Gerlich
+        page    70,132
+
+        ; BOOTSYS WILL NOT WORK ON ALL CP/M 3.1 SYSTEMS. WHY ?
+        ; If the MOVE, XMOVE are placed in the banked part of the bios
+        ; then it can be that this parts will be superscribed when
+        ; bootsys+cpm3.sys are transfered to bank 0.
+        ; Try it if this utility works under your CP/M 3 system.
+        ; If it works you can start a new version of your
+        ; bios (if you develop one) direct under CP/M 3.1 .
+        ;
+        ; Bootsys works always under CP/M 2.2 to relocate a nonbanked or a
+        ; banked system in CPM3.SYS and start CP/M 3.1 !!!
+        ;
+        ; You generate a cpm3.com for starting CP/M 3.1 with:
+        ;       pip cpm3.com=bootsys.com,cpm3.sys
+        ;
+
+
+What does BOOTSYS:
+==================
+
+	1. It tests if it runs on a x86 machine.
+	   (If it detect a x86 processor it execute x86-code which prints a
+	    message what BOOTSYS is and print the WWW and the FTP addresses
+	    of yaze-ag and exits.)
+	    
+	2. Check if CP/M vectors are present at 0000H (wboot) and 0005H (bdos).
+	   (- If present all output go direct to the conout of the bios. So
+	      this utility works also under other CP/M 3.1 systems as YAZE-AG.
+	      (Try it, I want to know if bootsys works on your cp/m-system.)
+	    - If not, bootsys try to boot CPM3.SYS in cooperation with YAZE-AG.)
+
+	3. Test if a copyright message is in the joined CPM3.SYS.
+	   (If not a message will be printed and bootsys exits.)
+
+	4. Test if CP/M 2.2 or CP/M 3.1 is running (only if cp/m vectors are
+           present):
+		CP/M 2.2 --> boot CPM3.SYS at once.
+		CP/M 3.1 --> transfere all from bank 1 to bank 0
+			     switch to bank 0 and boot CPM3.SYS.
+			     (If your Bios does not support xmove bootsys
+			      prints a message and exits.)
+
+	5. Relocate CPM3.SYS   (look to bootsys.z80 on drive P: how I
+				do it, sorry but the comments are in
+				german language ;-))
+
+	6. Start CP/M 3.1 by jumping into the boot routine of the bios.
+
+
+How do you use BOOTSYS?
+=======================
+
+You generate a CPM3.COM for starting CP/M 3.1 with the following command:
+
+	PIP CPM3.COM=BOOTSYS.COM,CPM3.SYS
+
+You simple append CPM3.SYS to BOOTSYS.COM.
+
+
+Usefull information are also in INSTALL-2.01, yaze-ag.doc, yaze.doc and
+README_BIOS3_Z80 (describe the files of the CP/M 3.1 bios (see drive P:) which
+acts as an interface to the yaze-bios (bios.c) ) !
+
+29 September 2002
+Andreas Gerlich
+(University of Ulm, Germany)
+
+only text emails please: yaze-ag (at) z80.de (SPAM-Account)

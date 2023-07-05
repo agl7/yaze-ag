@@ -1,0 +1,5 @@
+lib mlib=mylib<scanf,printf,hilfsl=hilfslib,diskf,wildca=wildcard>
+era mylib.rel
+ren mylib.rel=mlib.rel
+era a:mylib.rel
+pip a:=c:mylib.rel

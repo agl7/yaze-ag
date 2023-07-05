@@ -1,0 +1,6 @@
+mount a BOOT_UTILS.ydsk
+mount b CPM3_SYS.ydsk
+# mount c BOOT_UTILS_windows.ydsk
+# clock 4000		# set clock to 4000 kHz (4.0 MHz)
+# attach aux /dev/pts/5
+go

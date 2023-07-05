@@ -1,0 +1,157 @@
+
+
+Was ist das DISKSORT Projekt?
+=============================
+
+Disksort ist ein Defrag-tool fuer CP/M, wie SPEEDISK (von Norton) oder DEFRAG
+unter Windows.
+
+Das Projekt ist in der Programmiersprache C geschrieben und laeuft
+ausschlieslich im TPA von CP/M. Es hat Restriktionen bezeuglich der Disksize
+bzw. der Files die auf einer Disk abgelegt sind.
+Disks mit mit ungefaehr 4-5 MB Dateninhalt koe nnen in der Regel noch sortiert
+werden!
+
+Ich habe das Projekt sehr hart unter CP/M 3.1/2.2 innerhalb YAZE-AG getestet
+und ich meine es laeuft fehlerfrei unter CP/M 3.1 / 2.2 !!!
+(Zur Erinnerung: YAZE-AG ist ein CPU-Emulator in dem ein original CP/M 3.1
+laeuft (ich benutze den freien BDOS3-Ersatz "ZPM3N10" von Simeon Cran) oder
+der freie CP/M 2.2-Ersatz "SUPERDOS").
+
+--> Trotz aller Tests meinerseits ist es Dein eigenes Risiko Disksort auf
+    Deinem eigenen realen CP/M Rechner zu benutzen !!!
+
+Disksort laeuft unter CP/M 2.2 oder unter CP/M 3.1.
+
+Wenn der TPA reduziert ist reduziert sich automatisch die Groesse von Files
+die sortiert werden koennen.
+
+Der Autor des Projekts ist ein ehemaliger Kommilitone aus meinem Studium.
+Er erlaubt die Software mit Quellen an jeden CP/M User weiter zu geben.
+
+
+Die Projektfiles:
+=================
+
+Disksort ist in der Programmiersprache C geschrieben, aber es benutzt nicht
+den HI-C-Compiler, sondern es benutzt den MI-C-Compiler, ein deutsches Produkt.
+
+Das Projekt ist eine Demonstration fuer die Spezialitaet von YAZE-AG wie es
+(Unix-/Windows-)Directories behandelt die an ein CP/M Laufwerk gemountet
+werden koennen.
+Die Sourcen liegen in einer Directory unter Unix (oder Windows) und diese ist
+ans Laufwerk C: gemounted. YAZE-AG importiert auch die Time Stamps von jeder
+(Unix-)Datei in das simulierte CP/M-Laufwerk.
+
+Dadurch ist es moeglich eine MAKE-Utlility zu benutzen um das Projekt in
+Abhaengigkeit von Time Stamps zu uebersetzen (siehe "MAKE.COM" auf Laufwerk
+A: (BOOT_UTILS)).
+
+Letztendlich ist es dadurch moeglich die Sourcen unter Unix/Windows mit einem
+Editor zu editieren, aber sie innerhalb von CP/M innerhalb YAZE-AG zu
+compilieren.
+(Es ist moeglich den VI oder jeden anderen Unix-Editor zu benutzen der das
+ CP/M-Format (meist als DOS-Format bezeichnet) beherrscht --> CR-LF; meine
+ favorisierten Editoren sind "nedit" unter Unix/Solaris/Linux und metapad
+ (http://liquidninja.com/metapad/) unter Windows)
+
+Auf Laufwerk D: (gemounted an Diskfile DISKSORT.dsk) sind alle Utilites und
+die MAKEFILE um das ganze Projekt zu compilieren. Der Compiler ist hinzuge-
+fuegt aber nur die ausfuehrbare Datei CCZ.COM des MI-C-Compilers.
+Der Compiler benutzt ein eigenes Linker-Format, aber er kann auch das REL-
+Format.
+
+In der Makefile DISKSORT.MAK habe ich die compiler switches hinzugefuegt,
+damit das Projekt mit dem L80 gelinkt werden kann und ich habe eine reduzierte
+library (MYLIB.REL) der C-Library von MI-C hinzugefuegt.
+
+
+Compilieren mit der Makefile "DISKSORT.MAK":
+============================================
+
+Drive D: (gemounted an Diskfile "DISKSORT.dsk") ist mit INITDIR formatiert und
+ich habe die "Update Time Stamps" im Label eingeschaltet.
+Zur Erinnerung: Nur auf Diskfiles kann der MI-C-Compiler seine REL-Dateien
+ablegen, da nur Diskfiles unter YAZE-AG beschrieben werden koennen.
+Gemountete Directories sind immer nur READ-Only!
+
+Drive C:, mit den Sourcen des Projekts, ist an die Unix-(Windows-)Directory
+"./disksort/" gemounted und YAZE-AG importiert automatisch die Update Time 
+Stamps jeder Datei in die simulierte CP/M directory von Laufwerk C: !!!
+(Die Directory "./disksort/original/" beinhaltet die Originaldateien in
+ deutscher Sprache. Auch die Messagedatei ist in deutscher Spache gehalten.
+ Auch diese koennen unveraendert mit der Makefile auf LW D: uebersetzt werden,
+ wenn diese Directory auf C: gemountet wird)
+
+Wenn Du eines der Submit files "D.SUB", "DD.SUB" oder "DDD.SUB" zum compilieren
+benutzt, wird innerhalb dieser das Kommando "make -f disksort.mak $1" ausge-
+fuehrt um das Projekt zu compilieren oder um alle temporaeren Files zu loeschen
+("d clean" loescht Temp-Files, "d" alleine compiliert das Projekt).
+
+Fuer weitere detailierte Informationen schaue in das Kapitel "7. Mounting 
+directories with Time Stamps" in der Datei yaze-ag.doc[.html] in der YAZE-AG
+Dokumentation. Dort beschreibe ich datailiert wie das Feature "Mounting
+Directories" unter YAZE-AG benutzt werden kann. Und ich beschreibe die Submit
+Files dieses Projekts.
+
+
+Was macht DISKSORT genau?
+=========================
+
+Das Programmablauf ist ziemlich sicher. Es benutzt CRCs ueber jeden Block einer
+Datei um nachtraeglich zu ueberpruefen ob der sortierte Inhalt auch dem 
+Urspruenglichen entspricht.
+Dabei werden folgende Phasen durchlaufen:
+
+	1. CP/M Version feststellen:
+	   (Davon abhaengig ist die Art wie das BIOS aufgerufen wird.)
+	2. Feststellen ob das betreffende Laufwerk TIME Stamps benutzt.
+	   (Diese werden entsprechend behandelt wenn vorhanden)
+	3. Sortieren der DIR-Eintraege nach verschiedenen Kriterien im
+	   Speicher (TPA).
+	4. Ueber jeden Block jeder File einen CRC bilden und auf dem 
+	   Laufwerk (unter CRC.SRT) ablegen das als zweiter Parameter
+	   angegeben ist. (Benutzt wird CRC16 das auch das CRC.COM benutzt).
+	5. Neue Directory wegschreiben (danach darf das Programm nicht unter-
+	   brochen werden oder der Stom ausfallen !!!)
+	6. Die Dateien physikalisch sortieren !!!
+	7. Alle CRC's jeden Blocks jeder Datei ueberpruefen ob sie dem
+	   urspruenglichen Zustand entsprechen.
+		Wenn alles OK ist kommt die Meldung (English):
+		"All files have exactly the same data as bevor sorting."
+		 "Disks sort successfully completed"
+
+
+Aufruf von Disksort:
+====================
+
+	disksort a: b: [modus]
+
+	a: das Laufwerk das sortiert werden soll
+
+	b: Temporaeres Laufwerk auf dem einige Temporaere Dateien abgelegt
+	   werden:
+		CRC.SRT    - Datei mit allen CRC's ueber alle Bloecke
+		OLDDIR.SRT - Alte Directory
+	   Auf diesem Laufwerk muss auch die Messagedatei DISKSORT.MSG 
+	   vorhanden sein!
+
+	modus: Zahl zwischen 0 und 4 (wird modus weggelassen wird 0 angenommen)
+
+		0: Keinerlei Ausgaben. Das Programm macht seine Arbeit ohne
+		   irgendeine Ausgabe.
+		1: Ein paar Ausgaben ueber Memorybenutzung und was das Programm
+		   gerade macht wird ausgegeben. Diese Einstellung bevorzuge
+		   ich.
+		2: Ist fuer Debugging. Es druckt detailierte Informationen
+		   aus insbesondere die zwei Tabellen translate[i] und back[i].
+		3: Bildet die CRC's ueber jeden Block von jeder File die in
+		   CRC.SRT steht und vergleicht sie mit den angelegenen CRC'S.
+		   Wenn ein CRC falsch ist wird "CRC-error" ausgegeben.
+		4: Druckt die Benutztung von Modus aus. Auf dem Laufwerk das
+		   als b: angegeben ist, muss sich die Messagedatei
+		   DISKSORT.MSG befinden.
+
+
+7.3.2005
+Andreas Gerlich (Andreas.Gerlich@mathematik.uni-ulm.de)

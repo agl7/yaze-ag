@@ -1,0 +1,774 @@
+<html>
+
+<head>
+<meta http-equiv="content-type" content="text/html;charset=iso-8859-1">
+
+<title>INSTALL-2.51.3</title>
+
+<style type="text/css">
+<!--
+body { margin-left:30px; margin-top:20px; margin-right:30px;
+	background-color:#FFFFC8; color:#000000 }
+li { margin-bottom:15 }
+
+a:link { font-weight:bold; color:#0000E0; text-decoration:none }
+a:visited { font-weight:bold; color:#000080; text-decoration:none }
+a:hover { font-weight:bold; color:#FF0000; text-decoration:none }
+a:active { font-weight:bold; color:#E00000; text-decoration:underline }
+a:focus { font-weight:bold; color:#00E000; text-decoration:underline }
+
+p	{ margin-bottom:15px }
+.no_b	{ margin-bottom: 0px }
+.no_bt	{ margin-bottom: 0px; margin-top: 0px }
+.no_t	{ margin-top: 0px }
+//-->
+</style>
+
+</head>
+
+<body>
+<pre>
+My english is not so good, I hope you understand what I write here.
+---
+(At the end there are some screen snapshots when yaze-ag-2.20 starts.)
+---
+
+<b>Install yaze-ag-2.51.3:
+=======================</b>
+
+Sections:
+
+	 1. <a href="#solaris">SOLARIS</a> (SparcV9)
+	 2. <a href="#linux">LINUX</a>
+	 3. <a href="#freebsd">FreeBSD</a>
+	 4. <a href="#cygwin">Cygwin</a> (Windows)
+	 5. <a href="#macosx">Mac-OS-X</a> (not yet ready)
+	 6. <a href="#raspi1">Raspberry Pi 1 .......... (ARMv6, 32Bit)</a>
+	 7. <a href="#raspi2">Raspberry Pi 2 Model B .. (ARMv7, 32Bit)</a>
+	 8. <a href="#raspi3-32">Raspberry Pi 3 Model B/B+ (ARMv7, 32Bit)</a>
+	 9. <a href="#raspi3-64">Raspberry Pi 3 Model B/B+ (ARMv8, 64Bit)</a>
+	10. <a href="#raspi4-32">Raspberry Pi 4 Model B .. (ARMv7, 32Bit, 4GB + 8GB)(e.g. for the RaspberrypiOS of the Raspberrypi Foundation (32Bit))</a>
+	11. <a href="#raspi4-64">Raspberry Pi 4 Model B .. (ARMv8, 64Bit, 4GB + 8GB)(e.g. for the Manjaro-RPi4-Image (64Bit) or RaspberrypiOS (64Bit))</a>
+	12. <a href="#OrangePiPlus2">Orange Pi Plus/Plus2 (ARMv7, 32Bit)</a>
+	13. <a href="#radxa">Radxa Rock/RockPro/RockLite</a>
+
+	<a href="#notes">Notes if you want to install yaze-ag in your system (Unix/Linux/FreeBSD)</a>
+	<a href="#start">How do you start yaze-ag?</a>
+	<a href="#yazerc_window">How can I edit the .yazerc startup file as a WINDOWS user?</a>
+	<a href="#documentation">Documentation</a>
+	<a href="#snapshoots">Screen snapshoots of the old YAZE-AG-2.20 at start</a>
+
+<a name="solaris">&nbsp;</a>
+1. If you want to run yaze-ag on <b>SOLARIS</b> (SparcV9 and X86_64) then
+   (cc and gcc)
+
+	copy  Makefile_solaris_cc-sparcv9  to  Makefile (for CC compiler  and SparcV9 processor)
+	copy  Makefile_solaris_cc-x86_64   to  Makefile (for CC compiler  and X86_64  processor)
+	copy  Makefile_solaris_gcc-sparcv9 to  Makefile (for GCC compiler and SparcV9 processor)
+	copy  Makefile_solaris_gcc-x86_64  to  Makefile (for GCC compiler and X86_64  processor)
+
+	edit Makefile in the section optimizing: Refer the
+	switches -mcpu in "man cc" or "man gcc" and set the switches
+	like your hardware
+
+	then call "make" or "make -j &lt;cores&gt;"
+
+	If you want to install the emulator in the system read the
+	notes above in this document.
+	To install the files in /usr/local/bin and /usr/local/lib/yaze
+	give the command "make install" as root.
+
+<a name="linux">&nbsp;</a>
+2. If you want to run yaze-ag on <b>LINUX</b> then
+   (gcc version 3.3 20030226 (prerelease) (openSuSE)
+
+	copy  Makefile_linux_32_i586         to Makefile   (for a 32 Bit (e.g. i586) processor)
+	copy  Makefile_linux_64_amd_athlon64 to Makefile   (for AMD 64 Bit processor)
+	copy  Makefile_linux_64_intel_corei7 to Makefile   (for Intel corei7 processor)
+	copy  Makefile_linux_64_intel_nocona to Makefile   (for Intel 64Bit processor)
+
+	edit Makefile in the section optimizing:
+	Refer the section optimizing and
+	set -march and -mtune like your hardware<cr>
+
+	then call "make" or "make -j &lt;cores&gt;"
+
+	If you want to install the emulator in the system read the
+	notes above in this document.
+	To install the files in /usr/local/bin and /usr/local/lib/yaze
+	give the command "make install" as root or use "sudo make install".
+
+<a name="freebsd">&nbsp;</a>
+3. If you want to run yaze-ag on <b>FreeBSD</b> then
+
+	copy  Makefile_freebsd  to  Makefile
+
+	edit Makefile in the section optimizing:
+	Refer the section optimizing (clang or gcc) and
+	set -march and -mtune like your hardware (default: -march=barcelona)
+
+	then call "make" or "make -j &lt;cores&gt;".
+
+	If you want to install the emulator in the system read the
+	notes above in this document.
+	To install the files in /usr/local/bin and /usr/local/lib/yaze
+	give the command "make install" as root.
+
+<a name="cygwin">&nbsp;</a>
+4. If you want to run yaze-ag on <b>Cygwin (Windows)</b> then
+   (gcc (cygwing special))
+
+	copy  Makefile_cygwin_32           to  Makefile  (for 32 Bit machines or ARM8 with x86_32 emulation)
+	copy  Makefile_cygwin_64_core2duo  to  Makefile  (for Intel core2duo machines)
+	copy  Makefile_cygwin_64_corei7    to  Makefile  (for Intel corei7   machines)
+	copy  Makefile_cygwin_64_generic   to  Makefile  (for all   x86_64   machines)
+
+	edit Makefile in the section optimizing:
+	Refer the section optimizing (gcc) and
+	set -march and -mtune like your hardware
+
+	then call "make" or "make -j &lt;cores&gt;".
+
+	If you want to install the emulator in the system read the
+	notes above in this document.
+	To install the files in /usr/local/bin and /usr/local/lib/yaze
+	give the command "make install".
+
+<a name="macosx">&nbsp;</a>
+5. If you want to run yaze-ag on <b>Mac-OS-X</b> then
+   (gcc ?.?.?)
+
+	You have to use the Makefile_solaris
+
+	Refer to section "SOLARIS".
+
+	Which switches are to set, that I don't know at this time.
+
+<a name="raspi1">&nbsp;</a>
+6. If you want to run yaze-ag on a <b>Raspberry Pi 1</b> then
+
+	open a terminal (e.g. LXterminal)
+
+	download yaze-ag-2.51.3.tar.gz with the command:
+	"wget http://www.mathematik.uni-ulm.de/users/ag/yaze-ag/devel/yaze-ag-2.51.3.tar.gz"
+
+	give the command "tar zxvlpf yaze-ag-2.51.3.tar.gz" to unpack yaze-ag
+
+	Then "cd yaze-ag-2.51.3"
+
+	copy 'Makefile_Raspberry_Pi_1' to 'Makefile' with the command:
+	"cp  Makefile_Raspberry_Pi_1  Makefile"
+
+	Then call "make" ...(the compilation needs a little bit more time because<cr>
+			     of only one core in the processor and only 700 MHz)
+
+	Then call "sudo make install" to install yaze-ag in your Raspberry Pi 1 system.
+
+	Go back to your home directory and
+	remove the files in yaze-ag-2.51.3 and remove the directory
+	yaze-ag-2.51.3 and yaze-ag-2.51.3.tar.gz.
+
+	Call "man yaze" to read the manual page (it's updated in this final release).
+
+	Call "yaze" or "cpm" or "z80" to run the emulator.
+	(This will create the directory "$HOME/cpm".)
+
+	In the directory "$HOME/cpm/doc_html" is the complete documentation.
+	Click on "index.html" in the file manager to open it in your Web-browser!
+
+	Have fun :-)
+
+	(If you want to use the editor of the Turbo-Modula-2 compiler, then expand
+	 the size of the terminal to 80x25 (25 lines)!
+	 If you want to use the Wordstar 4.00 Editor you can expand the Terminal window
+	 to the size as you wish, but expand to &lt;=99 columns because Wordstar can only
+	 use terminals up to 99 columns and 99 lines.)
+
+	With the command "mount" you can see the connected disk files (*.ydsk)
+	and directories.
+
+	With the comands "3DIR.COM", "I.COM", "II.COM" or "DIR.COM" you can
+	print out the contents of the disks.
+
+	With the command "HELP.COM" you get help of the CP/M system commands.
+
+<a name="raspi2">&nbsp;</a>
+7. If you want to run yaze-ag on a <b>Raspberry Pi 2 Model B (ARMv7)</b> then
+
+	open a terminal (e.g. LXterminal)
+
+	download yaze-ag-2.51.3.tar.gz with the command:
+	"wget http://www.mathematik.uni-ulm.de/users/ag/yaze-ag/devel/yaze-ag-2.51.3.tar.gz"
+
+	give the command "tar zxvlpf yaze-ag-2.51.3.tar.gz" to unpack yaze-ag
+
+	Then "cd yaze-ag-2.51.3"
+
+	copy 'Makefile_Raspberry_Pi_2_Model_B' to 'Makefile' with the command:
+	"cp  Makefile_Raspberry_Pi_2_Model_B  Makefile"
+
+	Then call "make -j 4"...(the compilation needs some time)
+
+	Then call "sudo make install" to install yaze-ag in your system.
+
+	Go back to your home directory and
+	remove the files in yaze-ag-2.51.3 and remove the directory
+	yaze-ag-2.51.3 and yaze-ag-2.51.3.tar.gz.
+
+	Call "man yaze" to read the manual page (it's updated in this final release).
+
+	Call "yaze" or "cpm" or "z80" to run the emulator.
+	(This will create the directory "$HOME/cpm".)
+
+	In the directory "$HOME/cpm/doc_html" is the complete documentation.
+	Click on "index.html" in the file manager to open it in your Web-browser!
+
+	Have fun :-)
+
+	(If you want to use the editor of the Turbo-Modula-2 compiler, then expand
+	 the size of the terminal to 80x25 (25 lines)!
+	 If you want to use the Wordstar 4.00 Editor you can expand the Terminal window
+	 to the size as you wish, but expand to <=99 columns because Wordstar can only
+	 use terminals up to 99 columns and 99 lines.)
+
+	With the command "mount" you can see the connected disk files (*.ydsk)
+	and directories.
+
+	With the comands "3DIR.COM", "I.COM", "II.COM" or "DIR.COM" you can
+	print out the contents of the disks.
+
+	With the command "HELP.COM" you get help of the CP/M system commands.
+
+<a name="raspi3-32">&nbsp;</a>
+8. If you want to run yaze-ag on <b>Raspberry Pi 3 Model B/B+ (ARMv7, 32Bit)</b> then
+
+	open a terminal (e.g. LXterminal)
+
+	download yaze-ag-2.51.3.tar.gz with the command:
+	"wget http://www.mathematik.uni-ulm.de/users/ag/yaze-ag/devel/yaze-ag-2.51.3.tar.gz"
+
+	give the command "tar zxvlpf yaze-ag-2.51.3.tar.gz" to unpack yaze-ag
+
+	Then "cd yaze-ag-2.51.3"
+
+	copy 'Makefile_Raspberry_Pi_3_Model_B_ARMv7_32Bit' to 'Makefile' with the command:
+	"cp  Makefile_Raspberry_Pi_3_Model_B_ARMv7_32Bit  Makefile"
+
+	Then call "make -j 4"...(the compilation needs some time)
+
+	Then call "sudo make install" to install yaze-ag in your system.
+
+	Go back to your home directory and
+	remove the files in yaze-ag-2.51.3 and remove the directory
+	yaze-ag-2.51.3 and yaze-ag-2.51.3.tar.gz.
+
+	Call "man yaze" to read the manual page (it's updated in this release).
+
+	Call "yaze" or "cpm" or "z80" to run the emulator.
+	(This will create the directory "$HOME/cpm".)
+
+	In the directory "$HOME/cpm/doc_html" is the complete documentation.
+	Click on "index.html" in the file manager to open it in your Web-browser!
+
+	Have fun :-)
+
+	(If you want to use the editor of the Turbo-Modula-2 compiler, then expand
+	 the size of the terminal to 80x25 (25 lines)!
+	 If you want to use the Wordstar 4.00 Editor you can expand the Terminal window
+	 to the size as you wish, but expand to <=99 columns because Wordstar can only
+	 use terminals up to 99 columns and 99 lines.)
+
+	With the command "mount" you can see the connected disk files (*.ydsk)
+	and directories.
+
+	With the comands "3DIR.COM", "I.COM", "II.COM" or "DIR.COM" you can
+	print out the contents of the disks.
+
+	With the command "HELP.COM" you get help of the CP/M system commands.
+
+<a name="raspi3-64">&nbsp;</a>
+9. If you want to run yaze-ag on <b>Raspberry Pi 3 Model B/B+ (ARMv8, 64Bit)</b> then
+
+	open a terminal (e.g. LXterminal)
+
+	download yaze-ag-2.51.3.tar.gz with the command:
+	"wget http://www.mathematik.uni-ulm.de/users/ag/yaze-ag/devel/yaze-ag-2.51.3.tar.gz"
+
+	give the command "tar zxvlpf yaze-ag-2.51.3.tar.gz" to unpack yaze-ag
+
+	Then "cd yaze-ag-2.51.3"
+
+	copy 'Makefile_Raspberry_Pi_3_Model_B_ARMv8_64Bit' to 'Makefile' with the command:
+	"cp  Makefile_Raspberry_Pi_3_Model_B_ARMv8_64Bit  Makefile"
+
+	Then call "make -j 4"...(the compilation needs some time)
+
+	Then call "sudo make install" to install yaze-ag in your system.
+
+	Go back to your home directory and
+	remove the files in yaze-ag-2.51.3 and remove the directory
+	yaze-ag-2.51.3 and yaze-ag-2.51.3.tar.gz.
+
+	Call "man yaze" to read the manual page (it's updated in this final release).
+
+	Call "yaze" or "cpm" or "z80" to run the emulator.
+	(This will create the directory "$HOME/cpm".)
+
+	In the directory "$HOME/cpm/doc_html" is the complete documentation.
+	Click on "index.html" in the file manager to open it in your Web-browser!
+
+	Have fun :-)
+
+	(If you want to use the editor of the Turbo-Modula-2 compiler, then expand
+	 the size of the terminal to 80x25 (25 lines)!
+	 If you want to use the Wordstar 4.00 editor you can expand the Terminal window
+	 to the size as you wish, but expand to <=99 columns because Wordstar can only
+	 use terminals up to 99 columns and 99 lines.)
+
+	With the command "mount" you can see the connected disk files (*.ydsk)
+	and directories.
+
+	With the comands "3DIR.COM", "I.COM", "II.COM" or "DIR.COM" you can
+	print out the contents of the disks.
+
+	With the command "HELP.COM" you get help of the CP/M system commands.
+
+<a name="raspi4-32">&nbsp;</a>
+10. If you want to run yaze-ag on <b>Raspberry Pi 4 Model B (ARMv7, 32Bit)</b> then
+
+	open a terminal (e.g. LXterminal)
+
+	download yaze-ag-2.51.3.tar.gz with the command:
+	"wget http://www.mathematik.uni-ulm.de/users/ag/yaze-ag/devel/yaze-ag-2.51.3.tar.gz"
+
+	give the command "tar zxvlpf yaze-ag-2.51.3.tar.gz" to unpack yaze-ag
+
+	Then "cd yaze-ag-2.51.3"
+
+	copy 'Makefile_Raspberry_Pi_4_Model_B_ARMv7_32Bit' to 'Makefile' with the command:
+	"cp  Makefile_Raspberry_Pi_4_Model_B_ARMv7_32Bit  Makefile"
+
+	Then call "make -j 4"...(the compilation needs some time)
+
+	Then call "sudo make install" to install yaze-ag in your system.
+
+	Go back to your home directory and
+	remove the files in yaze-ag-2.51.3 and remove the directory
+	yaze-ag-2.51.3 and yaze-ag-2.51.3.tar.gz.
+
+	Call "man yaze" to read the manual page (it's updated in this release).
+
+	Call "yaze" or "cpm" or "z80" to run the emulator.
+	(This will create the directory "$HOME/cpm".)
+
+	In the directory "$HOME/cpm/doc_html" is the complete documentation.
+	Click on "index.html" in the file manager to open it in your Web-browser!
+
+	Have fun :-)
+
+	(If you want to use the editor of the Turbo-Modula-2 compiler, then expand
+	 the size of the terminal to 80x25 (25 lines)!
+	 If you want to use the Wordstar 4.00 Editor you can expand the Terminal window
+	 to the size as you wish, but expand to <=99 columns because Wordstar can only
+	 use terminals up to 99 columns and 99 lines.)
+
+	With the command "mount" you can see the connected disk files (*.ydsk)
+	and directories.
+
+	With the comands "3DIR.COM", "I.COM", "II.COM" or "DIR.COM" you can
+	print out the contents of the disks.
+
+	With the command "HELP.COM" you get help of the CP/M system commands.
+
+<a name="raspi4-64">&nbsp;</a>
+11. If you want to run yaze-ag on <b>Raspberry Pi 4 Model B (ARMv8, 64Bit)</b> then
+
+	open a terminal (e.g. LXterminal)
+
+	download yaze-ag-2.51.3.tar.gz with the command:
+	"wget http://www.mathematik.uni-ulm.de/users/ag/yaze-ag/devel/yaze-ag-2.51.3.tar.gz"
+
+	give the command "tar zxvlpf yaze-ag-2.51.3.tar.gz" to unpack yaze-ag
+
+	Then "cd yaze-ag-2.51.3"
+
+	copy 'Makefile_Raspberry_Pi_4_Model_B_ARMv8_64Bit' to 'Makefile' with the command:
+	"cp  Makefile_Raspberry_Pi_4_Model_B_ARMv8_64Bit  Makefile"
+
+	Then call "make -j 4"...(the compilation needs some time)
+
+	Then call "sudo make install" to install yaze-ag in your system.
+
+	Go back to your home directory and
+	remove the files in yaze-ag-2.51.3 and remove the directory
+	yaze-ag-2.51.3 and yaze-ag-2.51.3.tar.gz.
+
+	Call "man yaze" to read the manual page (it's updated in this final release).
+
+	Call "yaze" or "cpm" or "z80" to run the emulator.
+	(This will create the directory "$HOME/cpm".)
+
+	In the directory "$HOME/cpm/doc_html" is the complete documentation.
+	Click on "index.html" in the file manager to open it in your Web-browser!
+
+	Have fun :-)
+
+	(If you want to use the editor of the Turbo-Modula-2 compiler, then expand
+	 the size of the terminal to 80x25 (25 lines)!
+	 If you want to use the Wordstar 4.00 editor you can expand the Terminal window
+	 to the size as you wish, but expand to <=99 columns because Wordstar can only
+	 use terminals up to 99 columns and 99 lines.)
+
+	With the command "mount" you can see the connected disk files (*.ydsk)
+	and directories.
+
+	With the comands "3DIR.COM", "I.COM", "II.COM" or "DIR.COM" you can
+	print out the contents of the disks.
+
+	With the command "HELP.COM" you get help of the CP/M system commands.
+
+<a name="OrangePiPlus2">&nbsp;</a>
+12. If you want to run yaze-ag on <b>Orange Pi Plus/Plus2 (ARMv7, 32Bit)</b> then
+
+	open a terminal (e.g. LXterminal)
+
+	download yaze-ag-2.51.3.tar.gz with the command:
+	"wget http://www.mathematik.uni-ulm.de/users/ag/yaze-ag/devel/yaze-ag-2.51.3.tar.gz"
+
+	give the command "tar zxvlpf yaze-ag-2.51.3.tar.gz" to unpack yaze-ag
+
+	Then "cd yaze-ag-2.51.3"
+
+	copy 'Makefile_Orange_Pi_Plus2_ARMv7' to 'Makefile' with the command:
+	"cp  Makefile_Orange_Pi_Plus2_ARMv7  Makefile"
+
+	Then call "make -j 4"...(the compilation needs some time)
+
+	Then call "sudo make install" to install yaze-ag in your system.
+
+	Go back to your home directory and
+	remove the files in yaze-ag-2.51.3 and remove the directory
+	yaze-ag-2.51.3 and yaze-ag-2.51.3.tar.gz.
+
+	Call "man yaze" to read the manual page (it's updated in this release).
+
+	Call "yaze" or "cpm" or "z80" to run the emulator.
+	(This will create the directory "$HOME/cpm".)
+
+	In the directory "$HOME/cpm/doc_html" is the complete documentation.
+	Click on "index.html" in the file manager to open it in your Web-browser!
+
+	Have fun :-)
+
+	(If you want to use the editor of the Turbo-Modula-2 compiler, then expand
+	 the size of the terminal to 80x25 (25 lines)!
+	 If you want to use the Wordstar 4.00 editor you can expand the Terminal window
+	 to the size as you wish, but expand to <=99 columns because Wordstar can only
+	 use terminals up to 99 columns and 99 lines.)
+
+	With the command "mount" you can see the connected disk files (*.ydsk)
+	and directories.
+
+	With the comands "3DIR.COM", "I.COM", "II.COM" or "DIR.COM" you can
+	print out the contents of the disks.
+
+	With the command "HELP.COM" you get help of the CP/M system commands.
+
+<a name="radxa">&nbsp;</a>
+13. If you want to run yaze-ag on <b>Radxa Rock/RockPro/RockLite</b> then
+
+	open a terminal (e.g. LXterminal)
+
+	download yaze-ag-2.51.3.tar.gz with the command:
+	"wget http://www.mathematik.uni-ulm.de/users/ag/yaze-ag/devel/yaze-ag-2.51.3.tar.gz"
+
+	give the command "tar zxvlpf yaze-ag-2.51.3.tar.gz" to unpack yaze-ag
+
+	Then "cd yaze-ag-2.51.3"
+
+	copy 'Makefile_radxa_Rock_RockPro_RockLite' to 'Makefile' with the command:
+	"cp  Makefile_radxa_Rock_RockPro_RockLite  Makefile"
+
+	Then call "make -j 4"...(the compilation needs some time)
+
+	Then call "sudo make install" to install yaze-ag in your system.
+
+	Go back to your home directory and
+	remove the files in yaze-ag-2.51.3 and remove the directory
+	yaze-ag-2.51.3 and yaze-ag-2.51.3.tar.gz.
+
+	Call "man yaze" to read the manual page (it's updated in this release).
+
+	Call "yaze" or "cpm" or "z80" to run the emulator.
+	(This will create the directory "$HOME/cpm".)
+
+	In the directory "$HOME/cpm/doc_html" is the complete documentation.
+	Click on "index.html" in the file manager to open it in your Web-browser!
+
+	Have fun :-)
+
+	(If you want to use the editor of the Turbo-Modula-2 compiler, then expand
+	 the size of the terminal to 80x25 (25 lines)!
+	 If you want to use the Wordstar 4.00 editor you can expand the Terminal window
+	 to the size as you wish, but expand to <=99 columns because Wordstar can only
+	 use terminals up to 99 columns and 99 lines.)
+
+	With the command "mount" you can see the connected disk files (*.ydsk)
+	and directories.
+
+	With the comands "3DIR.COM", "I.COM", "II.COM" or "DIR.COM" you can
+	print out the contents of the disks.
+
+	With the command "HELP.COM" you get help of the CP/M system commands.
+
+
+<a name="notes">&nbsp;</a>
+<b>Notes if you want to install yaze-ag in your system
+===================================================</b>
+
+"make install" do following:  (BINDIR, LIBDIR ... are defined in the Makefiles)
+
+    in BINDIR
+	install yaze_bin	(yaze-ag executable (the Z80 emulator))
+	install cdm		(CP/M Disk Manager)
+	install yaze		(a shell script which copies some CP/M disks
+				 if necessary and starts yaze_bin, see yaze(1))
+	symbolic link  cpm --> yaze
+	symbolic link  z80 --> yaze
+
+    in LIBDIR
+	install yaze-cpm3.boot	(bootsys + cpm3.sys) (ZPM3)
+	install yaze.boot	(Superdos a CP/M 2.2 replacement)
+
+    in MANDIR
+	install yaze.1		(man page of yaze-ag)
+	install cdm.1		(man page of the CP/M Disk Manager)
+	install cpm.1		(reference to yaze.1)
+	install z80.1		(reference to yaze.1)
+
+    in DSKDIR
+	Install some disks which are copied by the shell script "yaze"
+	to $HOME/cpm if necessary (have a look to yaze(1) ).
+
+    in DOCDIR
+	install the whole documentation there. The shell script "yaze"
+	makes links to this documents in $HOME/cpm/doc.
+
+    in DOCHTMLDIR
+        install the whole documentation there in HTML format. The shell
+        script "yaze" makes links to this documents in $HOME/cpm/doc_html.
+
+
+<a name="start">&nbsp;</a>
+<b>How do you start yaze-ag?
+=========================</b>
+
+<b>Users of Unix/Linux/FreeBSD/MacOSX/Raspberry_Pi:</b>
+
+	Start YAZE-AG-2.51.3 with the shell script "yaze". Look to yaze.1 or
+	yaze(1) (man yaze) it describes also the strategy of the shell script yaze.
+
+	If you does no changes in the Makefile yaze-ag (yaze_bin) will be compiled
+	with the options -DMMU and -DBOOTSYS. So yaze-ag will load and run
+	yaze-cpm3.boot at 0100H (BOOTSYS.com+CPM3.SYS) instead of yaze.boot (CP/M 2.2).
+	If the option -DBOOTSYS is deleted yaze-ag starts CP/M 2.2 (yaze.boot) - then
+	you can start CP/M 3.1 by simple running cpm3.com (the unix file yaze-cpm3.boot
+	is the same as cpm3-ok.com/cpm3.com on drive A:).
+
+	If you delete the option -DMMU yaze-ag can run only CP/M 2.2 (yaze.boot) then
+	you have to delete -DBOOTSYS too.
+
+	The .yazerc startup file ist in the $HOME/cpm directory.
+	
+<b>Windows users:</b>
+
+	Start the emulator with the YAZE-AG icon on the Desktop,
+	or start it with the YAZE-AG entry in the Start-Menu.
+
+
+<a name="yazerc_window">&nbsp;</a>
+<b>How can I edit the .yazerc startup file as a Windows user?
+==========================================================</b>
+
+Windows users have the entry "Edit startup file .yazerc" in the Start-Menue in
+the YAZE-AG entry.
+
+There you can put .ydsk-files which are mounted at startup.
+There is also an attach entry for the serial line which yaze-ag uses.
+
+The last command must be the "go" entry to start the emulator.
+
+<a name="documentation">&nbsp;</a>
+<b>Documentation
+=============</b>
+
+The plain text documentation is obsolete!
+
+Click on index.html in the $HOME/cpm/doc_html directory!
+<b>(Windows users have an entry for the documentation in the YAZE-AG entry in the
+ Start-Menue.)</b>
+
+The whole documentation are in yaze-ag_doc.html, yaze_doc.html and the README's,
+
+Yaze-ag_doc and README_BOOTSYS describes my new CP/M 3.1 Bootloader BOOTSYS and
+describes why I had to developed BOOTSYS and how BOOTSYS works.
+
+README_BIOS3_Z80 describes the Z80 ASM-files of the CP/M 3.1 BIOS on drive P:
+which act as an interface to the yaze-bios (ybios.c).
+
+On every yaze-disk is a file with the name "0-README.1ST". This file describes
+the contents of the disk.
+
+Let me know if you test yaze-ag-2.51.3 or if you find an error or you miss a
+feature. Feel free and send an email to me.
+
+January 1, 2022
+Dipl.-Ing. (FH) Andreas Gerlich
+(University of Ulm, Germany)
+
+<font size="+1">only text emails please: address removed!!! (email of the project)</font>
+-------------------------------------------------------------------------------
+<a name="snapshoots">&nbsp;</a>
+<b>* Begin of screen snapshoots *</b>
+
+
+<b>Screen snapshoots of the old YAZE-AG-2.20 at start:</b>
+
+===============================================================================
+$ yaze
+
+Yet Another Z80 Emulator by AG, version 2.20 (MMU)
+Copyright 1995,1998 Frank D. Cringle. Pagetables Copyright by Michael Haardt.
+MMU and CP/M 3.1 extensions Copyright (c) 2000,2008 by Andreas Gerlich.
+yaze-ag comes with ABSOLUTELY NO WARRANTY; for details
+see the file "COPYING" in the distribution directory.
+
+RAM: 1024 KByte, 4 KByte PAGESIZE, 256 PAGES
+MMU: 16 TABLES, 16 PAGEPOINTERS per TABLE, selected MMU-PAGETABLE: 0
+
+Running '/usr/local/lib/yaze/yaze-cpm3.boot'
+
+ BOOTSYS - CPM3.SYS, V 1.20 12.03.2005 Copyright (c) 2000,2008 by A.Gerlich
+ No CP/M vektors found, try to boot CP/M 3.1 in cooperation with yaze-ag ...
+
+ Loading CP/M 3.1 ...
+
+ 62K TPA
+
+ DRIVES:  A B . . E F G H I J . . M N O P
+
+ CP/M 3.1 BIOS for yaze-ag, V 1.00 15.01.2002, Copyright (c) by A.Gerlich
+A>
+A>
+A>
+A>mmuprint       (-- Prints the status of the MMU)
+RAM: 1024 KByte, 4 KByte PAGESIZE, 256 PAGES
+MMU: 16 TABLES, 16 PAGEPOINTERS per TABLE, selected MMU-PAGETABLE: T01
+
+Z80-\ T00 T01 T02 T03 T04 T05 T06 T07 T08 T09 T10 T11 T12 T13 T14 T15
+ADDR \--------------------------------------------------------------------------
+0000 :  10 >  0<  20  30  40  50  6E  1F  8E  9E  AE  BE  CE  DE  EE  FE
+1000 :   1 > 11<  21  31  41  51  6D  2F  8D  9D  AD  BD  CD  DD  ED  FD
+2000 :   2 > 12<  22  32  42  52  6C  3F  8C  9C  AC  BC  CC  DC  EC  FC
+3000 :   3 > 13<  23  33  43  53  6B  4F  8B  9B  AB  BB  CB  DB  EB  FB
+4000 :   4 > 14<  24  34  44  54  6A  5F  8A  9A  AA  BA  CA  DA  EA  FA
+5000 :   5 > 15<  25  35  45  55  69  6F  89  99  A9  B9  C9  D9  E9  F9
+6000 :   6 > 16<  26  36  46  56  68  7F  88  98  A8  B8  C8  D8  E8  F8
+7000 :   7 > 17<  27  37  47  57  67  77  87  97  A7  B7  C7  D7  E7  F7
+8000 :   8 > 18<  28  38  48  58  66  76  86  96  A6  B6  C6  D6  E6  F6
+9000 :   9 > 19<  29  39  49  59  65  75  85  95  A5  B5  C5  D5  E5  F5
+A000 :   A > 1A<  2A  3A  4A  5A  64  74  84  94  A4  B4  C4  D4  E4  F4
+B000 :   B > 1B<  2B  3B  4B  5B  63  73  83  93  A3  B3  C3  D3  E3  F3
+C000 :   C > 1C<  2C  3C  4C  5C  62  72  82  92  A2  B2  C2  D2  E2  F2
+D000 :   D > 1D<  2D  3D  4D  5D  61  71  81  91  A1  B1  C1  D1  E1  F1
+E000 :   E > 1E<  2E  3E  4E  5E  60  70  80  90  A0  B0  C0  D0  E0  F0
+F000 :   F >  F<   F   F   F   F   F   F   F   F   F   F   F   F   F   F
+--------------------------------------------------------------------------------
+
+A>
+A>
+===============================================================================
+
+
+
+<b>Screen output of YAZE-AG-2.20 if CP/M 3.1 is already running and you
+would start CPM3.COM (BOOTSYS transferes BOOTSYS and the joined CPM3.SYS
+from bank 1 (TPA bank) to bank 0 (SYS bank) switch to bank 0 and starts
+CP/M 3.1 in bank 0):</b>
+
+===============================================================================
+$ yaze
+
+Yet Another Z80 emulator ...
+    ... (see above)
+    ...
+    ...
+ CP/M 3.1 BIOS for yaze-ag ...
+A>
+A>    (-- CP/M 3.1 is running)
+A>
+A>cpm3
+
+ BOOTSYS - CPM3.SYS, V 1.20 12.03.2005 Copyright (c) 2000,2008 by A.Gerlich
+
+ CP/M 3.1 is already running and bank 1 is selected! Now move all to bank 0 ...
+
+ Now all is transfered and bank 0 is selected -> CPM3.SYS will be loaded. :-)
+ (this message comes after a switch from bank 1 to bank 0)
+
+ Loading CP/M 3.1 ...
+
+ 62K TPA
+
+ DRIVES:  A B . . E F G H I J . . M N O P
+
+ CP/M 3.1 BIOS for yaze-ag, V 1.00 15.01.2002, Copyright (c) by A.Gerlich
+A>
+A>
+===============================================================================
+
+
+
+<b>Screen output of YAZE-AG-2.20 if CP/M 2.2 is started and CPM3.COM will be run:
+(if -DBOOTSYS is deleted in the Makefile the output is the same)</b>
+
+===============================================================================
+$ yaze -l -1 -b yaze.boot    (-l (loading address) must be -1 to relocate the
+                              the CP/M 2.2 (superdos) in yaze.boot.)
+
+Yet Another Z80 Emulator by AG, version 2.20 (MMU)
+Copyright 1995,1998 Frank D. Cringle. Pagetables Copyright by Michael Haardt.
+MMU and CP/M 3.1 extensions Copyright (c) 2000,2008 by Andreas Gerlich.
+yaze-ag comes with ABSOLUTELY NO WARRANTY; for details
+see the file "COPYING" in the distribution directory.
+
+RAM: 1024 KByte, 4 KByte PAGESIZE, 256 PAGES
+MMU: 16 TABLES, 16 PAGEPOINTERS per TABLE, selected MMU-PAGETABLE: 0
+
+Running '/usr/local/lib/yaze/yaze.boot'
+
+A>    
+A>    (-- CP/M 2.2 (superdos) is running and bank 0 is selected)
+A>
+A>cpm3
+
+ BOOTSYS - CPM3.SYS, V 1.20 12.03.2005 Copyright (c) 2000,2008 by A.Gerlich
+
+ Loading CP/M 3.1 ...
+
+ 62K TPA
+
+ DRIVES:  A B . . . F G H . . . . M N O P
+
+ CP/M 3.1 BIOS for yaze-ag, V 1.00 15.01.2002, Copyright (c) by A.Gerlich
+A>
+A>    (-- CP/M 3.1 is running)
+A>
+===============================================================================
+
+<b>* End of screen snapshoots *</b>
+
+</pre>
+</body>
+
+</html>

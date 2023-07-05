@@ -1,0 +1,50 @@
+<html><head><title>EXAMPLES    </title></head><body><pre>
+  <a href="043.html">PIP</a> (COPY)  
+    <a href="044.html">EXAMPLES</a>    
+
+
+  COPY A FILE FROM ONE DISK TO ANOTHER
+
+       A>PIP b:=a:draft.txt
+       A>PIP b:draft.txt = a:
+
+       B3>PIP myfile.dat=A:[G9]
+       A9>PIP B:[G3]=myfile.dat
+
+  COPY A FILE AND RENAME IT
+
+       A5>PIP newdraft.txt=oldraft.txt
+       C8>PIP b:newdraft.txt=a:oldraft.txt
+
+  COPY MULTIPLE FILES
+
+       A>PIP b:=draft.*
+       A>PIP b:=*.*
+       B>PIP b:=c:.*.*
+       C>PIP b:=*.txt[g5]
+       C>PIP a:=*.com[wr]
+       B>PIP a:[g3]=c:*.*
+
+  COMBINE MULTIPLE FILES
+
+       A>PIP b:new.dat=file1.dat,file2.dat
+
+  COPY, RENAME AND PLACE IN USER 1
+
+       A>pip newdraft.txt[g1]=oldraft.txt
+
+  COPY, RENAME AND GET FROM USER 1
+
+       A>PIP newdraft.txt=oldraft.txt[g1]
+
+  COPY TO/FROM LOGICAL DEVICES
+
+       A>PIP b:funfile.sue=con:
+       A>PIP lst:=con:
+       A>PIP lst:=b:draft.txt[t8]
+       A>PIP prn:=b:draft.txt
+
+  
+
+
+<a href="./">HELP&gt;</a>  </pre></body></html>

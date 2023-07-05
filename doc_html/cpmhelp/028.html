@@ -1,0 +1,37 @@
+<html><head><title>EXAMPLES    </title></head><body><pre>
+  <a href="026.html">GET</a>         
+    <a href="028.html">EXAMPLES</a>    
+
+
+  A>GET FILE XINPUT
+  A>MYPROG
+
+       Tells the system to  activate the GET utility.  Since SYSTEM
+       is  not specified, the system reads the next input line from
+       the console and   executes   MYPROG.    If  MYPROG   program
+       requires  console  input,  it is taken from the file XINPUT.
+       When MYPROG terminates,  the  system  reverts  back  to  the
+       console for console input.
+
+  A>GET FILE XIN2 [SYSTEM]
+
+       Immediately  directs   the   system    to    get  subsequent
+       console  input from file XIN2 because it includes the SYSTEM
+       option.  The system reverts  back   to   the   console   for
+       console  input  when it reaches the end of file in XIN2.  Or
+       XIN2 may redirect the system  back  to  the  console  if  it
+       contains a  GET CONSOLE command.
+
+  A>GET CONSOLE
+
+       Tells the system to get console   input  from  the  console.
+       This  command may be used in a file (previously specified in
+       a GET FILE command), which is already  being  read   by  the
+       system   for   console  input.  It is used  to re-direct the
+       console input back to  the console  before the   end-of-file
+       is reached.
+
+  
+
+
+<a href="./">HELP&gt;</a>  </pre></body></html>

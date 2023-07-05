@@ -1,0 +1,109 @@
+<html>
+
+<head>
+<meta http-equiv="content-type" content="text/html;charset=iso-8859-1">
+<title>README_BOOTSYS</title>
+
+<style type="text/css">
+<!--
+body { background-color:#FFFFC8; color:#000000 }
+//-->
+</style>
+
+</head>
+
+<body>
+<pre>
+My english is not so good, I hope you understand what I write here.
+---
+<b>See also yaze-ag.doc chapter "4. Some words to BOOTSYS"</b>
+---
+
+<b>What is BOOTSYS?
+================</b>
+
+The BOOTSYS utility relocates and places the resident and banked (if present)
+part in CPM3.SYS to their right places into memory and starts CP/M 3.1.
+
+BOOTSYS WILL NOT WORK ON ALL CP/M 3.1 SYSTEMS. Why?
+If the MOVE & XMOVE routines are placed in the banked part of the BIOS then it
+is possible that this routines can be overwritten when bootsys+cpm3.sys are
+transferred from bank 1 (TPA) to bank 0 (SYS).
+
+Try it. If this utility works under your CP/M 3 system then you can start
+a new version of your BIOS3 from the current one without having to write
+it to the system tracks!
+
+
+<b>What does BOOTSYS:
+==================</b>
+
+	1. Check if CP/M vectors are present at 0000H (wboot) and 0005H (bdos).
+
+	   - If present all output go direct to the conout of the bios. So
+	     this utility works also with other CP/M 3.1 systems than YAZE-AG.
+	     (Try it, I want to know if bootsys works on your cp/m-3-system.)
+
+	   - If not, bootsys try to boot CPM3.SYS using YAZE-AG.
+
+	2. If CP/M vectors are present it checks if a Drive (e.g. 'p:') is 
+	   given as a parameter to the bootsys call:
+	   
+	   - If present bootsys tries to load CPM3.SYS from that drive.
+	   
+	   - if not present bootsys tries to load CPM3.SYS from the default
+	     drive which is defined in the source of bootsys.mac.
+
+	3. Test if a copyright message is in the loaded/joined CPM3.SYS.
+	
+	   - If not a message will be printed and bootsys exits.
+
+	4. Test if CP/M 2.2 or CP/M 3.1 is running (only if cp/m vectors are
+           present):
+		CP/M 2.2 --> boot CPM3.SYS at once.
+		CP/M 3.1 --> transfere all from bank 1 (TPA) to bank 0 (SYS)
+			     switch to bank 0 and boot CPM3.SYS.
+			     (If your Bios does not support xmove bootsys
+			      prints a message and exits.)
+
+	5. Relocate CPM3.SYS   (look to bootsys.mac on drive P: how I
+				do it. The comments are in german and
+				english language ;-))
+
+	6. Start CP/M 3.1 by jumping into the boot routine of the bios3.
+
+
+<b>How do you use BOOTSYS?
+=======================</b>
+
+You have two ways to use BOOTSYS.COM:
+
+1. Call BOOTSYS.COM in your CP/M 3.1/2.2 system. You can give a parameter
+   for a drive (e.g. "p:" (the colon is necessary)) or not. If there is a drive
+   given BOOTSYS tries to load CPM3.SYS from that drive which is given in the
+   parameter.
+   If there is no drive given BOOTSYS.COM tries to load from that drive which
+   is given in the source BOOTSYS.MAC (e.g. 'A').
+
+2. You generate a CPM3.COM for starting CP/M 3.1 with the following command:
+
+	PIP CPM3.COM=BOOTSYS.COM,CPM3.SYS
+
+   You simple append CPM3.SYS to BOOTSYS.COM and save both in CPM3.COM.
+   Then Call CPM3.COM to start CP/M 3.1. Bootsys starts the attached CPM3.SYS
+   at once.
+
+CPM3.COM is identically with the boot file "yaze-cpm3.boot" which is loaded at
+the start of yaze-ag and is places in /usr/local/lib/yaze/yaze-cpm3.boot .
+
+
+February 14, 2022
+Dipl.-Ing. (FH) Andreas Gerlich
+(University of Ulm, Germany)
+
+<font size="+1">only text emails please: address removed !!!</font>
+
+</pre>
+</body>
+
+</html>

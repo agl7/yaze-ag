@@ -1,0 +1,5 @@
+lib xlib=lib(iswand,alloc,strin1,strin2,ctest),printf,scanf
+lib mylib=xlib,hilfslib,diskf,wildcard,clibz,lib(sbrk-last)
+era xlib.rel
+era a:mylib.rel
+pip a:=c:mylib.rel

@@ -1,0 +1,34 @@
+<html><head><title>GET         </title></head><body><pre>
+  <a href="026.html">GET</a>         
+
+
+  Syntax:
+
+  GET {CONSOLE INPUT FROM} FILE filespec{[{ECHO|NO ECHO} | SYSTEM]}
+  GET {CONSOLE INPUT FROM} CONSOLE
+
+  Explanation:
+
+  GET  directs the system to take console input from a file for the
+  next system  command  or  user  program entered at the console.
+
+  Console input  is  taken  from   a   file   until   the   program
+  terminates.  If  the  file  is  exhausted before program input is
+  terminated, the program  looks  for  subsequent  input  from  the
+  console.  If  the  program  terminates  before exhausting all its
+  input, the system reverts back to the console for console  input.
+
+  With  the  SYSTEM  option,  the  system  immediately  goes to the
+  specified file for console input.  The  system  reverts  to   the
+  console   for  input  when it reaches the end of file.  Re-direct
+  the system to the  console  for   console   input  with  the  GET
+  CONSOLE INPUT FROM CONSOLE command as a command line in the input
+  file.
+
+  
+ENTER .subtopic FOR INFORMATION ON THE FOLLOWING SUBTOPICS:
+
+<a href="027.html">OPTIONS</a>     <a href="028.html">EXAMPLES</a>    
+
+
+<a href="./">HELP&gt;</a>  </pre></body></html>

@@ -1,0 +1,17 @@
+doc_html/BOOTSYS.Z80.html
+doc_html/How_to_read.txt
+doc_html/INSTALL-2.51.2.html
+doc_html/README-1.10.html
+doc_html/README-2.51.2.html
+doc_html/README_BIOS3_Z80.html
+doc_html/README_BOOTSYS.html
+doc_html/cdm.1.html
+doc_html/e_mail_yaze-ag.png
+doc_html/happy.gif
+doc_html/index.html
+doc_html/mintty.pdf
+doc_html/yaze-ag_doc.html
+doc_html/yaze.1.html
+doc_html/yaze_doc.html
+doc_html/yaze-keys.odt
+doc_html/yaze-keys.pdf

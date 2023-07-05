@@ -1,0 +1,45 @@
+;-----------------------------------------------
+;		KTT.COM
+;
+; A very simple program to get yaze to load
+; keyboard translations.
+;
+; ktt		Reports current translation
+; ktt -		Unloads translation
+; ktt <file>	Loads translation from <file>
+;
+;-----------------------------------------------
+
+	.Z80
+
+	org	100h
+
+; The CCP translates the user input into upper case
+; and that is probably not what we want for a UNIX
+; file name.
+
+	ld	hl,80h		; Command line
+	ld	b,(hl)		; Command length
+	inc	b		; Pre-increment for loop conditioning
+xloop:
+	dec	b
+	jp	z,ybios
+
+	inc	hl		; Translate command line to lower case
+	ld	a,(hl)
+	cp	'A'
+	jp	c,xloop
+	cp	'Z'+1
+	jp	nc,xloop
+	or	20h
+	ld	(hl),a
+	jp	xloop
+ybios:
+	halt
+	db	0A8h
+	nop
+	nop
+	nop
+	jp	0
+
+	end

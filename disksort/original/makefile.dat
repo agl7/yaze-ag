@@ -1,0 +1,30 @@
+CCC	= ccz
+CFLAGS	= /08sd
+ASM	= Z80ASM
+ASMFLAGS= /M6
+
+OBJ	= disk1.rel disk2.rel disk3.rel disk4.rel disksort.rel
+
+disksort.com: $(OBJ)
+	mera
+	l80 xxxmain,disksort,disk1,disk2,disk3,disk4,mylib/s,disksort/n/y/e
+	crc disksort.com
+
+$(OBJ): disk.h
+
+.c.rel:
+	era $*.z80
+	$(CCC) $(CFLAGS) $*
+	ren $*.z80=$*.asm
+	$(ASM) $*$(ASMFLAGS)
+	era $*.z80
+
+clean:
+	3erase disk?.rel disksort.rel
+	3erase disk?.z80 disksort.z80
+	3erase disk?.asm disksort.asm
+	3erase disk?.prn disksort.prn
+	3erase *.sym
+	3erase *.lst
+
+

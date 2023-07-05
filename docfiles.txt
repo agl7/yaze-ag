@@ -1,0 +1,9 @@
+doc/00-INDEX.doc
+doc/yaze.doc
+doc/yaze-ag.doc
+doc/README-1.10
+doc/README-2.20
+doc/README_BIOS3_Z80
+doc/README_BOOTSYS
+doc/INSTALL-2.20
+doc/COPYING

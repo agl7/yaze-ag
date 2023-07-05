@@ -1,0 +1,419 @@
+Sorry, my english language is not good, I hope you understand what I write here.
+
+
+2008-06-06  Andreas Gerlich
+
+	pre release 2.20-RC1 (ready for Unix/Linux/FreeBSD)
+
+	* I complete the documentation
+	  (the use of the serial lines is now documented)
+	  (I add in the HTML-Documentation the contens of
+	   the CP/M 3 helpfile "HELP.HLP")
+
+	* I change/complete the install process (make install)
+	  and the startup shell script "yaze.sh"
+
+
+2008-06-02  Andreas Gerlich
+
+	development version 2.13-12
+
+	* fix a severe bug when connecting (Unix-/Windows-)directories
+	  to a CP/M drive.
+
+
+2008-03-29  Andreas Gerlich
+
+	development version 2.13-11
+
+	* you can use COM1 (/dev/ttyS0) and COM2 (/dev/ttyS1)
+	  the seriell lines to an another computer.
+	  (not yet documented)
+
+-------------------------------------------------------------------------------
+
+2008-03-29  Andreas Gerlich
+
+	development version 2.13-11
+
+	* you can use COM1 (/dev/ttyS0) and COM2 (/dev/ttyS1)
+	  the seriell lines to an another computer.
+	  (not yet documented)
+
+2005-10-18  Andreas Gerlich
+
+	final release 2.12.1
+
+	* Bugfix: Jim Donoghue (USA, Houston, Texas) reports a bug in the
+	  Z80 assembler instructions OUTI and OUTD.
+
+2005-08-21  Andreas Gerlich
+
+	final release 2.12
+
+	* the "Umlaute" are handled correct now
+	  (this is only important for the Windows version of yaze-ag)
+
+
+2005-07-16  Andreas Gerlich
+
+	final release 2.11
+
+	* some changes in the Makefiles
+
+	I produce also the Windows binaries (build 01)
+
+
+2005-07-05  Andreas Gerlich
+
+	pre release 2.10-pre
+
+	Windows Versions have now the "build"-counter
+
+	* UCSD-Mode to run the UCSD P-System
+
+	* bios routines conin and conout do not mask with 0x7F
+
+	* I add the "DISKSORT" project
+
+	This version is for testing !!!
+
+	(read also all infomations until 2003-12-20 in this document.
+	 At 2003-12-20 I begin with this development circle)
+
+
+2005-03-05  Andreas Gerlich
+
+	development Version 2.02-11
+
+	* I adapt the emulator for the CYGWIN-Environment
+	  (remember CYGWIN is an unix environment for windows)
+
+	This version is for testing !!!
+
+	(read also all infomations until 2003-12-20 in this document.
+	 At 2003-12-20 I begin with this development circle)
+
+
+2004-08-16  Andreas Gerlich
+
+	development Version 2.02-10
+
+	* NEW: P:BIOSKRNL.Z80 changed. Now you can run Z3PLUS !!!  :-)
+
+	* NEW: I have to change the mount.com utility.
+	       Please don't use the old one (yaze crashes) !!!
+
+	* NEW: I put the changed documentation to the archive.
+	       (It's the documentation of the final release 2.10)
+
+	This version is for testing !!!
+
+	(read also all infomations until 2003-12-20 in this document.
+	 At 2003-12-20 I begin with this development circle)
+
+
+2004-04-14  Andreas Gerlich
+
+	development Version 2.02-08
+
+	* NEW: Now the time stamps informations are now correct on big endian
+	  (sparcv9) and on little endian (intel) machines.
+
+	* NEW: I integrate the new monitor command "setaccess on/off".
+	  (see also "help setaccess" in the monitor)
+	  When a Unix directory is connected to a CP/M drive normaly
+	  only update time stamps are present.
+	  If you will see also the access time stamps you switch
+	  it on with "setaccess on".
+	  (see "SET [ACCESS=ON]" in the help with HELP.COM)
+
+	This version is for testing !!!
+
+	(read also all infomations until 2003-12-20 in this document.
+	 At 2003-12-20 I begin with this development circle)
+
+
+2004-01-27  Andreas Gerlich
+
+	development Version 2.02-06
+
+	* NEW: When you connect a directory to a CP/M drive the date stamps
+	  of the unix files will now be present also under CP/M 3.1.
+	  The modification time of the unix files is the update time
+	  under CP/M 3.1 .
+
+	  Now it's posible to edit source files under unix/linux and
+	  to compile it under the yaze-ag emulator with the MAKE.COM
+	  (and resetdsk.com, look version 2.02-02 ) utility.
+
+	>>>> The time stamps are only correct on little endian machine
+		(for example Intel) !!!
+
+	This version is for testing.
+
+
+2004-01-25  Andreas Gerlich
+
+	development Version 2.02-04 (internal version not uploaded)
+
+	* integrate the date calculation function "dayfaktor" in bios.c
+	  (It calculates the theoretical days since 1.1.0000)
+	  (Gregorian calendar)
+	  (look to the Modula-2 sources DAYS.MOD/DEF and BIRTHDAY.MOD
+	   on drive M: (disk file "Turbo-Modula-2") when you have started
+	   the emulator.)
+
+	* Update the CP/M 3.1 function "Get and Set Time" in bios.c to use
+	  "dayfaktor".
+
+	* patch cdm.c with the patch from Carl Mascott.
+
+	* Carl Mascott reports an error with unmounting drives.
+	  The sys.com utility makes now a full reset of all drives (BDOS 37).
+
+	* cleanup all sources (*.c) to use the flag -D_BSD_SOURCE for Linux
+	  (I took the knowledge about this flag from yaze-1.12)
+
+
+2004-01-20  Andreas Gerlich
+
+	development version 2.02-02
+
+	* Fix reread bug of a unix directory
+
+	  Describtion:
+	  When you give a ^C (CTRL-C) at the prompt of the CCP
+	  the disk system in CP/M will be reseted completely.
+	  A drive which is connected to a directory will be
+	  now fully rereaded (remount) at the next access (SELDSK).
+
+	  You can use the feature "Mounting Directories" if you create
+	  and edit files with vi or an another editor under unix and
+	  you want to compile the files over a compiler/assembler in yaze-ag.
+	  (This new function works also under superdos (CP/M 2.2) which is
+	  in the boot file "yaze.boot".)
+
+	  I add the little program "RESETDSK.Z80/COM" which resets all
+	  disks over the BDOS function 37. This is identical like the
+	  CTRL-C. You can use this utility in a submit file:
+
+		compile.sub:
+
+		;
+		resetdsk
+		;
+		; Resets all disks. Every drive will be rereaded by
+		; CP/M 3.1. Direcrories will be fully rereaded.
+		;
+		m80 d:test=c:test
+		;
+		; d: must be a disk file.
+		; c: is connected to a directory and will be fully rereaded
+
+	  I add to the monitor the command "remount <drive>" which you can use
+	  also in a submit file with the command "sys remount <drive>"
+	  Remount makes also a remount (reread of the unix directory) explizit
+	  of the <drive>.
+		(It tells (like mount) over the MF flag in the DPH of the
+		<drive> and the @MEDIA flag in the SCB to CP/M 3.1 that
+		this drive is "new". At the next access to the <drive>
+		CP/M 3.1 tests if the <drive> is changed and makes a
+		reread of the directory if necessary.)
+
+	  You can also use the work around with
+		"sys mount <drive> <unix-directory>"
+	  which I describe on the web page of yaze-ag under
+	  "Mounting Directories"
+
+
+
+2003-12-20  Andreas Gerlich
+
+	I start with further development 
+
+	TODO:	I will fix the reread bug of a unix directory when you
+		give a CTRL-C at the command prompt or a CP/M program
+		resets the disk system over the BDOS function no. 37.
+		(bug described under the next section)
+
+	       (look chapter 3 "Known Bugs"
+		and chapter 7 "Mounting Directories"
+	        in yaze-ag.doc (or yaze-ag_doc.html))
+
+2003-12-20  Andreas Gerlich
+
+	Version 2.01
+
+	Timothy Wagner and Carl Mascott reports a complex bug in yaze-ag-2.00.
+	I test also the old version yaze-1.10. This bug is also there (I take
+	the code to access directories from yaze-1.00). I found also an
+	another error in coherence with unix directories.
+	(look to the bug fixes described here).
+
+	* I add to the distribution the whole HTML documentation.
+
+	* generate a Makefile_cygwin to compile yaze-ag also
+	  under the unix like environment "cygwin" under Windows :-)
+
+	* Put standalone windows binaries on the home page.
+
+	* The excecutable of the emulator is now
+	  named yaze_bin. That was neccessary because
+	  cygwin generates an exe-file (yaze_bin.exe) if
+	  you give no extension. The old name yaze.bin was
+	  not good for cygwin/windows. I also change this
+	  in yaze.sh (which will be copied to "yaze" if
+	  you make a "make install").
+
+	* I delete monitor.c_linux and monitor.c_solaris!
+	  Now there is only one monitor.c. It can be compiled
+	  under Solaris/Linux/FreeBSD/Cygwin.
+
+	* fix a terrible bug in function "readsector" in bios.c
+	  which reads a sector from a disk file or a unix directory:
+	  The file-cache which is used for accessing unix files
+	  was not correctly handled.
+	  That was a bug which crashes yaze-ag !!!
+	  (reported by Timothy Wagner and Carl Mascott)
+	  Have a look to yaze-ag.doc (or yaze-ag_doc.html) chapter
+	  "3. Known Bugs" and "7. Mounting Directories" !!!
+
+	* fix an another terrible bug in function "mountdir" in monitor.c
+	  which mounts directories to a drive under CP/M.
+	  Now double names are correctly handled (like "Source.z80"
+	  and "source.z80" which will be translated to "SOURCE.Z80"
+	  under CP/M). In the code of yaze-2.00 (and yaze-1.10 also)
+	  there was two directory entries with "SOURCE.Z80" created.
+	  Now only one of the both unix-files (Source.z80 or source.z80)
+	  gets an entry in the CP/M directory.
+	  That was a bug which crashes yaze-ag, too !!!
+	  Have a look to yaze-ag.doc chapter "3. Known Bugs" and
+	  "7. Mounting Directories" !!!
+
+	* BUG: A mounted unix directory does not reread once more if you
+	  give a CTRL-C (at the CCP) or a Program makes "disk resets" over
+	  the BDOS function 37. Look chapter 3 "Known Bugs" and the
+	  work around in and chapter 7 "Mounting Directories" in yaze-ag.doc
+	  (or yaze-ag_doc.html)
+	  
+
+2003-01-12  Andreas Gerlich
+
+	Version 2.00 (final release)
+
+	* I add the diskfile "Turbo-Modula-2" to the distribution
+	  It contents the Turbo Modula 2 Compiler of Borland.
+	  (The editor is adapted for the Linux console (25 lines, 80 columns).
+	   It works also in a xterm (but xterm starts with 24 lines,
+	   expand it to 25 lines))
+
+	* I made no changes (against the pre release) in the sources
+	  (I change only the printing of the version)
+
+
+2002-02-10  Andreas Gerlich
+
+	version 2.00 (pre release) for testing
+
+	* cdm.c can be compiled also under Linux
+
+
+2001-11-04  Andreas Gerlich
+
+	Development Version YAZE-AG-1.20-15
+
+	* Frank D. Cringle don't accept my work. After a half year
+	  of dicussion with him I decide to make a new project (look GPL)
+	  and I call it
+
+			"Yet Another Z80 Emulator by AG"
+				   or
+				"YAZE-AG"
+
+	* NEW: Memory Management Unit (MMU):
+	  The MMU have 16 tables to 16 page pointers (page size 4 KB)
+	  and adresses up to 1 MB.
+
+	* simz80.c: Optimizing: simz80 is faster than the version
+	  of yaze-1.10.
+	  NEW: I made the necessary changes to embed the MMU. 
+
+	* NEW: I made the necessary changes to embed the MMU in
+	  the whole system. I create the new module "mem_mmu.c/.h"
+
+	* NEW: I develop the BIOS3 (*.z80) and the yaze-bios (bios.c)
+	  for yaze-ag:
+		* enlage bios.c to make available all necessary functions
+		  for CP/M 3.1
+		* Idea: To create the Yaze-Control-Table (YCT) for
+		  communication between the bios and yaze-bios.
+		* enlage BIOS3/yaze-bios to use the "Disc change feature"
+		  of CP/M 3.1.
+		* implement xmove in yaze-bios (this enables disks with
+		  sektor size > 128 Byte, the default sectorsize is now
+		  2048 Bytes)
+		* implement Multi-I/O in yaze-bios (CP/M 3.1 reads/writes
+		  more than one sektor in one read/write call)
+		* implement Date in yaze-bios
+
+	* NEW: I developed BOOTSYS a CPM3.SYS loader because the
+	  CPMLDR/ZPM3LDR does not work with the big CPM3.SYS file.
+
+	* NEW: CP/M 3.1 runs on the Emulator:
+	  I create the new boot file "yaze-cpm3.boot". It contents 
+	  BOOTSYS + CPM3.SYS (ZPM3 is used in CPM3.SYS; it's the
+	  BDOS3 replacement of Simeon Cran) and is identical with
+	  CPM3.COM/CPM3-OK.COM on drive A: (BOOT_UTIL).
+	  The bios3 and the yaze-bios supports by the side of the
+	  fundamental features for CP/M 3.1 also the special features
+	  of CP/M 3.1 like date, xmove/move and multio (look "Features"
+	  in yaze-ag.doc (yaze-ag_doc.html))
+
+	* NEW: To access unix directories are adapted for CP/M 3.1
+
+	* BUG: cdm.c (CP/M Disk Manager) can not compiled under Linux
+	  (but under Solaris/FreeBSD/MacOS-X)
+
+-------------------------------------------------------------------------------
+
+1998-01-27  Frank D. Cringle  <fdc@cliwe.ping.de>
+
+	* simz80.pl: set the flags correctly for LD A,I/R and
+	CPI/CPIR/CPD/CPDR (reported by Sean Young).
+
+	* monitor.c (mountdir): fix fencepost error when setting cp[15],
+	as reported by Richard Hirst.
+
+1998-01-25  Frank D. Cringle  <fdc@cliwe.ping.de>
+
+	* simz80.pl: change direct and indirect references to the RAM()
+	macro, because it now evaluates its operand more than once if MMU
+	is in use (contributed by Michael Haardt).
+
+	* yaze.c, simz80.h: Make BIOS optional and add MMU initialisation
+	(contributed by Michael Haardt).
+
+Sun Apr 28 11:30:52 1996  Frank D. Cringle  <fdc@cliwe.ping.de>
+
+	* cdm.c (getblock): rename index to idx (avoids a warning about
+	shadowing index()).
+	(main): correct a type in the !USE_GNU_READLINE case.
+
+Thu Apr 25 15:32:24 1996  Frank D. Cringle  <fdc@cliwe.ping.de>
+
+	* bios.c (constat, lststat): select() may modify timeval, so
+	reinitialise it.
+	(readsec,writesec): protect against undefined or unmounted disk.
+	(bios): Add BgiiFix.
+
+	* monitor.c (mount): use MAP_FILE flag in mmap() call (linux-ism?).
+
+	* yaze.c (load_cpm): correctly calculate available memory if
+	loadadr is specified.
+
+	* simz80.pl (CALLC): rename symbol adr to avoid warning msg.
+
+	* cdm.c (srchdir): ignore cpm-3 byte count.
+
+

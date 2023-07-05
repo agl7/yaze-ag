@@ -1,0 +1,39 @@
+<html><head><title>EXAMPLE     </title></head><body><pre>
+  <a href="054.html">SAVE</a>        
+    <a href="055.html">EXAMPLE</a>     
+
+
+       A>SAVE
+
+  Activates the SAVE utility.  Now enter the name  of  the  program
+  which loads a file into memory.
+
+       A>SID dump.com
+
+  Next, execute the program.
+
+       #g0
+
+  When the program exits, SAVE intercepts the return to the  system
+  and prompts the user for the filespec and the bounds of memory to
+  be SAVEd.
+
+       SAVE Ver 3.0
+       Enter file (type RETURN to exit):dump2.com
+
+  If file DUMP2.COM exists already, the system asks:
+
+       Delete dump2.com? Y
+
+  Then the system asks for the bounds of memory to be saved:
+
+       Beginning hex address: 100
+       Ending hex address: 400
+
+  The contents of memory from 100H (Hexadecimal) to 400H is  copied
+  to file DUMP2.COM.
+
+  
+
+
+<a href="./">HELP&gt;</a>  </pre></body></html>

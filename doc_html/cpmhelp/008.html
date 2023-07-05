@@ -1,0 +1,60 @@
+<html><head><title>EXAMPLES    </title></head><body><pre>
+  <a href="006.html">DEVICE</a>      
+    <a href="008.html">EXAMPLES</a>    
+
+
+  A>DEVICE
+
+       Displays the physical devices and   current  assignments  of
+       the logical devices in the system.
+
+  A>DEVICE NAMES
+
+       Lists the physical devices with a   summary  of  the  device
+       characteristics.
+
+  A>DEVICE VALUES
+
+       Displays  the  current  logical  device assignments.
+
+  A>DEVICE CRT
+
+       Displays the attributes  of  the  physical device CRT.
+
+  A>DEVICE CON
+
+       Displays the  assignment  of  the  logical device CON:
+
+  A>DEVICE CONOUT:=LPT,CRT
+
+       Assigns  the  system   console    output  (CONOUT:)  to  the
+       printer (LPT) and the screen (CRT).
+
+  A>DEVICE AUXIN:=CRT2 [XON,9600]
+
+       Assigns the auxiliary logical input   device   (AUXIN:)   to
+       the   physical   device   CRT   using  protocol XON/XOFF and
+       sets the transmission rate for the device  at  9600.
+
+  A>DEVICE LST:=NULL
+
+       Disconnects the list output logical device (LST:).
+
+  A>DEVICE LPT [XON,9600]
+
+       Sets  the  XON/XOFF  protocol  for  the physical device  LPT
+       and sets the transmission speed at 9600.
+
+  A>DEVICE CONSOLE [PAGE]
+
+       Displays the current console  page  width  in  columns   and
+       length in lines.
+
+  A>DEVICE CONSOLE [COLUMNS=40 LINES=16]
+
+       Sets the screen size to 40 columns and 16 lines.
+
+  
+
+
+<a href="./">HELP&gt;</a>  </pre></body></html>

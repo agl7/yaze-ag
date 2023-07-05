@@ -1,0 +1,291 @@
+<!doctype html public "-//w3c//dtd html 4.01 transitional//EN">
+<html>
+
+<head>
+<title>YAZE-AG - Yet Another Z80 Emulator by AG (V 2.51.3) (HTML documentation)</title>
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+<meta name="robots"         content="nofollow" >
+<meta name="description"    content="Z80 Emulator for Unix / Linux / FreeBSD / Mac OS / Windows">
+<meta name="keywords" lang="en" content="Z80, Z80 Emulator, Z80-Emulator, Z80 Emulator for Unix, Z80 Emulator for Linux, Yet Another Z80 Emulator, Yet Another Z80 Emulator by AG, YAZE, YAZE-AG, yaze, yaze-ag, BOOTSYS">
+<meta name="keywords" lang="de" content="Z80, Z80 Emulator, Z80-Emulator, Z80 Emulator f&uuml;r Unix, Z80 Emulator f&uuml;r Linux, Yet Another Z80 Emulator, Yet Another Z80 Emulator by AG, YAZE, YAZE-AG, yaze, yaze-ag, BOOTSYS">
+<meta name="author"         content="Andreas Gerlich">
+<meta name="DC.Title"       content="Yet Another Z80 Emulator by AG">
+<meta name="DC.Creator"     content="Andreas Gerlich">
+<meta name="DC.Subject"     content="Z80 Emulator for Unix / Linux">
+<meta name="DC.Description" content="Z80 Emulator for Unix / Linux">
+<meta name="DC.Publisher"   content="Andreas Gerlich">
+<meta name="DC.Date"        content="2022-02-16T00:00:00+01:00">
+<meta name="DC.Type"        content="Software">
+<meta name="DC.Format"      content="text/html">
+<meta name="DC.Identifier"  content="http://www.mathematik.uni-ulm.de/users/ag/yaze-ag/">
+<meta name="DC.Language"    content="en">
+<meta name="DC.Rights"      content="GNU GENERAL PUBLIC LICENSE">
+
+
+<style type="text/css">
+<!--
+body { margin-left:30px; margin-top:20px; margin-right:30px;
+	background-color:#FFFFC8; color:#000000 }
+li { margin-bottom:15 }
+
+a:link { font-weight:bold; color:#0000E0; text-decoration:none }
+a:visited { font-weight:bold; color:#000080; text-decoration:none }
+a:hover { font-weight:bold; color:#FF0000; text-decoration:none }
+a:active { font-weight:bold; color:#E00000; text-decoration:underline }
+a:focus { font-weight:bold; color:#00E000; text-decoration:underline }
+
+p	{ margin-bottom:15px }
+.no_b	{ margin-bottom: 0px }
+.no_bt	{ margin-bottom: 0px; margin-top: 0px }
+.no_t	{ margin-top: 0px }
+//-->
+</style>
+
+</head>
+
+<body>
+
+<!-- Horizontal row ------------------------------------------------- //-->
+<hr>
+<h1>YAZE-AG - Yet Another Z80 Emulator by AG (V 2.51.3)</h1>
+<h2>(<font color="#008000">HTML  -  Documentation</font>)</h2>
+<hr>
+<!-- ---------------------------------------------------------------- //-->
+
+<h2>Introduction</h2>
+
+<p><b>
+yaze-ag is designed to provide an exact simulation of the Z80 microprocessor
+on a </b>
+   <ul>
+       <li class="no_b"><b>UNIX (Solaris)</b> (Sparc, x86_64)</li>
+       <li class="no_bt"><b>Linux</b> (x86_32, x86_64 and ARM)</li>
+       <li class="no_bt">
+           <b>Raspberry Pi 1</b> (ARMv6(ARM1176JZF-S), single core, 700 MHz (see
+           <a href="https://www.raspberrypi.org" target=_blank>https://www.raspberrypi.org</a>)
+       </li>
+       <li class="no_bt">
+           <b>Raspberry Pi 2 Model B</b> (ARMv7(Cortex-A7), quad core, 900 MHz (see
+           <a href="https://www.raspberrypi.org" target=_blank>https://www.raspberrypi.org</a>)
+       </li>
+       <li class="no_bt">
+           <b>Raspberry Pi 3 Model B</b> (ARMv7/ARMv8(Cortex-A53), quad core, 1,2 GHz (see
+           <a href="https://www.raspberrypi.org" target=_blank>https://www.raspberrypi.org</a>)
+       </li>
+       <li class="no_bt">
+           <b>Raspberry Pi 3 Model B+</b> (ARMv7/ARMv8(Cortex-A53), quad core, 1,4 GHz (see
+           <a href="https://www.raspberrypi.org" target=_blank>https://www.raspberrypi.org</a>)
+       </li>
+       <li class="no_bt">
+           <b>Raspberry Pi 4 Model B (4GB + 8GB)</b> (ARMv7/ARMv8(Cortex-A72), quad core, 1,5 GHz (see
+           <a href="https://www.raspberrypi.org" target=_blank>https://www.raspberrypi.org</a>)
+       </li>
+       <li class="no_bt">
+           <b>Orange Pi Plus2</b> (ARMv7(Cortex-A7), quad core, 1,6 GHz) (see
+           <a href="http://www.orangepi.org/orangepiplus2/" target=_blank>http://www.orangepi.org/orangepiplus2/</a>)
+       </li>
+       <li class="no_bt">
+           <b>Radxa Rock/RockPro/RockLite</b> (ARMv7(Cortex-A9), quad core, 1,6 GHz) (see
+           <a href="http://radxa.com" target=_blank>http://radxa.com</a>)
+       </li>
+       <li class="no_bt"><b>FreeBSD</b></li>
+       <li class="no_bt"><b>Mac OS X</b></li>
+       <li class="no_t"><b>Windows system (cygwin environment).</b></li>
+   </ul>
+<b>It is fast, emulates undocumented opcodes, and passes
+instruction regression tests against real Z80 hardware.
+</b></p>
+
+<p><b>NEW in yaze-ag version 2.xx.x is the support of an emulated Memory
+Management Unit (MMU) and the BIOS which supports CP/M 3.1 .</b>
+</p>
+
+<p class="no_b">
+<b>YAZE-AG is a Z80-CPU-Emulator and <u>NOT</u> a CP/M-Emulator!
+</b>
+</p>
+<p class="no_bt">
+<b>Inside the Emulator runs an original CP/M or a replacement of CP/M.
+</b>
+</p>
+<p class="no_t">
+<b>YAZE-AG uses the free CP/M 3.1 replacement "ZPM3N10"
+of Simeon Cran (bootfile "yaze-cpm3.boot") or the CP/M 2.2 replacement
+"Superdos" (bootfile "yaze.boot").
+</b>
+</p>
+
+<!-- ---------------------------------------------------------------- //-->
+<hr>
+
+<h2>How do you find new versions and the web page of YAZE-AG?</h2>
+
+<p>
+For detail information and new versions look to the web page of YAZE-AG
+</p>
+<p>
+<a href="http://yaze-ag.de/" target=_blank>http://yaze-ag.de/</a>
+</p>
+<p>
+it's a redirect to
+</p>
+<p>
+<a
+href="http://www.mathematik.uni-ulm.de/users/ag/yaze-ag/" target=_blank>http://www.mathematik.uni-ulm.de/users/ag/yaze-ag/</a>
+(the original page at the University of Ulm, Germany)
+</p>
+<p>
+<b>An another way to find the web page of YAZE-AG is a search with Google.</b>
+Give the search pattern "z80&nbsp;emulator" and the link to "YAZE-AG - Yet
+Another Z80 Emulator by AG" is in the first page of the search results.
+</p>
+<!-- ---------------------------------------------------------------- //-->
+<hr>
+
+<h2>BOOTSYS - CPM3.SYS loader (V 2.00; February 11, 2022)</h2>
+
+<p class="no_b">BOOTSYS relocates the resident and banked part of a CPM3.SYS
+to their places into memory and starts CP/M 3.1.</p>
+<p class="no_bt">
+I develop it because CPMLDR of DRI/Caldera and ZPM3LDR of Simeon
+Cran does not work with the big CPM3.SYS file (43 KB) in yaze-ag.
+</p>
+<p class="no_t">
+With Bootsys You can restart CP/M 3.1 under CP/M 3.1/2.2 itself (cold boot)!
+</p>
+
+<ul>
+
+<li>README for the CPM3.SYS loader BOOTSYS - <a href="README_BOOTSYS.html">
+    README_BOOTSYS</a> (it's updated at February 16, 2022)
+    <ul>
+    <li> See the chapter "<a href="yaze-ag_doc.html#bootsys">4. Some Words to BOOTSYS</a>" in 
+         <a href="yaze-ag_doc.html">yaze-ag.doc</a> - it describes why I had 
+         to developed BOOTSYS
+    </li>
+    </ul>
+</li>
+
+<li>The source of BOOTSYS - <a href="BOOTSYS.Z80.html">BOOTSYS.Z80</a>
+    (<font color="#008000">intel-hex</font>,
+     <font color="#008000">uuencoded</font> )
+    <ul>
+	<li class="no_b">
+	    Sorry the comments are in German language ;-)
+	</li>
+	<li class="no_t">
+	    Tip: If you want to download it use the intel-hex or the
+	         uuencoded part
+	</li>
+    </ul>
+</li>
+
+<li>BOOTSYS compiled - <font color="#008000">BOOTSYS.COM</font>
+    (<font color="#008000">intel-hex</font>,
+     <font color="#008000">uuencoded</font>)
+</li>
+
+</ul>
+
+<!-- ---------------------------------------------------------------- //-->
+<hr>
+
+<h2>Documentation of YAZE-AG-2.51.3</h2>
+
+<ul>
+
+<li>A little documentation how you install yaze-ag-2.51.3 on Unix/Linux/Cygwin/MacOSx/RAspberry Pi - 
+    <a href="INSTALL-2.51.3.html">INSTALL-2.51.3</a>.
+    <ul>
+    <li>
+	Please read it because I have expanded the Install process
+	and you have to edit the Makefile.<br>
+     <b>There are also important informations for Windows users!!!</b>
+    </li>
+    </ul>
+</li>
+
+<li>How you install the Windows binaries go to the project web page
+	<a href="http://yaze-ag.de/" target=_blank>http://yaze-ag.de</a> and
+	look there for the link <b>Standalone Binaries for Windows</b>.
+</li>
+
+<li>You start yaze-ag with the shell script "yaze". Please read
+	<a href="yaze.1.html">yaze(1) <b>(<font color="#ff0000">New</font>)</b></a> it describes the binary "yaze_bin"
+	and the shell script "yaze" and what it install at first time.
+</li>
+
+<li>Windows users start the emulator with a link/icon on the Desktop or with
+	the entry in the Start-Menue or
+     with the batch file "yaze.bat"<br>
+	(See <font color="green">Standalone Binaries for Windows</font> on the project webpage.)
+    <ul>
+    <li>For the options of "yaze_bin.exe" read
+	    <a href="yaze.1.html">yaze(1) <b>(<font color="#ff0000">New</font>)</b></a>.
+    </li>
+    </ul>
+</li>
+
+<li>With the <a href="cdm.1.html">cdm(1)</a> utility you can handle the
+	&lt;CPM_disk&gt; files (.ydsk) which are used by yaze-ag.<br>
+	(Since YAZE-AG 2.30 you can use the import and export utilities R.COM and W.COM inside the emulator!)
+</li>
+
+</li>
+
+<li>The features of the old version 1.06/1.10 - 
+    <a href="README-1.10.html">README-1.10</a>
+</li>
+
+<li>The documentation of the old version 1.10 -
+    <a href="yaze_doc.html">yaze.doc</a>
+</li>
+
+<li>A README to release 2.51.2 - 
+    <a href="README-2.51.3.html">README-2.51.3</a>
+</li>
+
+<li>The documentation <b>only</b> of the new features until yaze-ag-2.51.2 -
+	<a href="yaze-ag_doc.html">yaze-ag.doc <b>(<font color="#ff0000">New</font>)</b></a>
+</li>
+
+<li>The <b>new</b> feature of <b>previous version yaze-ag-2.40.5</b> was the keytranslation -
+    <a href="yaze-keys.pdf">yaze-keys.pdf</a>
+</li>
+
+<li>A README of the CP/M 3.1 bios files (*.Z80 - Files) - 
+    <a href="README_BIOS3_Z80.html">README_BIOS3_Z80</a>
+</li>
+
+<li>The man page of the terminalemulator mintty.exe which is used for yaze-ag -
+    <a href="mintty.pdf">mintty.pdf</a>
+</li>
+
+<li>Help of CP/M 3.1 - <a href="cpmhelp/index.html">HELP.HLP</a>
+</li>
+
+</ul>
+
+<!--
+<p>For newer versions see the
+<a href="ftp://ag-yaze:yaze@xylopia-upload.mathematik.uni-ulm.de/devel/">
+development directory</a> and read there the file DONE or
+README.
+</p>
+//-->
+
+<!-- ---------------------------------------------------------------- //-->
+<hr>
+
+<p class="no_b">February 16, 2022</p>
+<p class="no_bt">Dipl.-Ing (FH) Andreas Gerlich</p>
+<p class="no_t">(University of Ulm, Germany) </p>
+<p class="no_t">XMPP/Jabber: agl@jwchat.org <img src="happy.gif" align="middle"></p>
+<p class="no_bt">IRC: agl @ IRCNet (rare online)</p>
+<p><font size="+1">only text emails please: <img
+src="e_mail_yaze-ag.png" align="middle"> (email of the project)</font></p>
+<p align=right> ( Last change February 16, 2022 ) </p>
+
+</body>
+
+</html>

@@ -1,0 +1,33 @@
+<html><head><title>EXAMPLES    </title></head><body><pre>
+  <a href="036.html">LINK</a>        
+    <a href="038.html">EXAMPLES</a>    
+
+
+  A>LINK b:MYFILE[NR]
+
+       LINK-80 on drive A uses as input MYFILE.REL on drive B   and
+       produces   the  executable  machine  code file MYFILE.COM on
+       drive B.  The [NR] option specifies no symbol table file.
+
+  A>LINK m1,m2,m3
+
+       LINK-80 combines the separately compiled files m1,  m2,  and
+       m3,  resolves  their  external  references, and produces the
+       executable machine code file m1.COM.
+
+  A>LINK m=m1,m2,m3
+
+       LINK-80 combines the separately compiled files m1,  m2,  and
+       m3 and produces the executable machine code file m.COM.
+
+  A>LINK MYFILE,FILE5[s]
+
+       The [s] option tells LINK-80 to search FILE5 as a   library.
+       LINK-80    combines    MYFILE.REL    with   the   referenced
+       subroutines contained in FILE5.REL  on  the  default   drive
+       A  and  produces MYFILE.COM on drive A.
+
+  
+
+
+<a href="./">HELP&gt;</a>  </pre></body></html>

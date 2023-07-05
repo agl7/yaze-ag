@@ -1,0 +1,78 @@
+; MAKE.C und MAKEFILE  (c) Copyright  11/1988 by Michael Schewe
+;                                                  3119 Gollern Nr.17
+;
+; Funktioniert nur unter CP/M 3 automatisch.
+; Unter CP/M 2 wird eine Fehlermeldung ausgegeben,das Programm
+; kann aber trotzdem benutzt werden,indem man danach SUBMIT A:MAKE eingibt !
+; Unter CP/M 2 ist die Anweisung IF_BEDINGUNG aber nicht zulaessig.
+;
+; !!!!!!!!!!!!!!!!!! Achtung !!!!!!!!!!!!!!!!!!!
+; Zwischen jedem Wort oder Vergleichszeichen,Klammern etc.
+; muss mindestens ein Blank stehen, sonst kommt es zu Syntaxfehlern !!!
+;
+; Syntaxaufbau:
+;
+; Die Datei MAKEFILE enthaelt ein oder mehrere Projekte, die mit
+; PROJEKT Name beginnen. Dieses Schluesselwort muss in der 1.Spalte stehen !
+; Nach PROJEKT muss durch nur ein Blank getrennt der Name folgen und
+; anschliessend ein Block.
+; Ein Block beginnt mit BEGIN. Danach folgen eine oder mehrere Anweisungen.
+; Das Ende eines Blocks wird mit END gekennzeichnet.
+; moegliche Anweisungen:
+;
+;    IF #varname Anweisung
+;    Wenn der zuvor mit LET der Stringvariablen varname zugewiesene String
+;    nicht leer ist wird Anweisung ausgefuehrt, sonst nicht.
+;
+;
+;    IF_BEDINGUNG ( file1 file2 file3 .. filen ) Anweisung
+;    file1 ist abhaengig von file2 .. filen
+;
+;    File1 ... Filen sind Dateinamen in der unter CP/M ueblichen Schreibweise
+;    (  [d:]Name[.Typ] ). Diese Anweisung setzt voraus, das das Directory
+;    des entsprechenden Laufwerks mit Zeitmarken (fuer Update) versehen sind.
+;    ( nur bei CP/M 3 vorhanden )
+;    Wenn eine der Dateien file2 ... filen gleichalt oder neuer als file1 ist
+;    wird Anweisung ausgefuehrt, sonst nicht.
+;    Ist eine Datei nicht vorhanden, so wird der Zeitpunkt 1.1.1978 0:0 ein-
+;    gesetzt.
+;    Leider werden die Sekunden nicht in den Zeitmarken mit eingetragen, so
+;    dass dies zu ueberfluessigen Uebersetzungsvorgaengen fuehren kann.
+;
+;
+;    LET #varname = Ausdruck
+;    Der Stringvariablen varname wird ein neuer, durch Ausdruck bestimmter
+;    Wert zugewiesen. Der alte Wert wird ueberschrieben.
+;
+;    DO Ausdruck
+;    Der durch Ausdruck bestimmte String wird als CP/M Kommandozeile
+;    ausgefuehrt.
+;    Zum Abschliessen einer Zeile muss in dem String am Ende ein \n stehen !
+;
+;    BEGIN Anweisung ... Anweisung END
+;    Ein neuer Block ist auch eine Anweisung.
+;
+; Ein Ausdruck kann bestehen aus:
+;   -  Ein durch Anfuehrungsstriche eingeschlossenen Text.
+;      Beispiel: "Dies ist ein Ausdruck."
+;   -  Einem Variablennamen, dem ein # direkt voransteht.
+;      Dieser Stringvariablen muss mit LET vorher ein Wert zugewiesen sein,
+;      sonst entsteht einen Fehlermeldung.
+;      Beispiel: #varname
+;   -  Einer Operation.
+;      Diese beginnt mit dem Zeichen ( auf das ein Teilausdruck folgt.
+;      Daraufhin kann der einzige zulaessige Stringoperator + folgen und
+;      danach wieder ein Teilausdruck.( auch mehrfach)
+;        Ein Teilausdruck besteht entweder aus #varname oder
+;        "beliebiger String"
+;      Wirkung: Es werden die einzelnen Teilstrings zu einem zusammengefuegt.
+;      Am Emde der Operation muss das Zeichen ) stehen !
+;      Beispiele fuer zulaessige Operationen:
+;      ( "text" )
+;      ( #varname + "Beliebiger text" )
+;      ( "Beliebiger Text" + #varname )
+;      ( #var1 + #var2 + "etwas text" + #var3 + "noch etwas\n" )
+;
+;  Die Option Test beim Aufruf bewirkt, dass die auszufuehrenden Kommandos
+;  nur auf dem Bildschirm aufgelistet werden.
+

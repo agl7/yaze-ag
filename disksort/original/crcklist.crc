@@ -1,0 +1,23 @@
+
+--> FILE:  CCZ     .COM		CRC = DA A7
+--> FILE:  DISKSORT.COM		CRC = 9D CC
+--> FILE:  MAKE    .COM		CRC = 65 27
+--> FILE:  CLEAN   .SUB		CRC = 82 1B
+--> FILE:  DISK    .H  		CRC = C9 82
+--> FILE:  DISK1   .C  		CRC = 89 55
+--> FILE:  DISK2   .C  		CRC = 90 23
+--> FILE:  DISK3   .C  		CRC = EA 01
+--> FILE:  DISK4   .C  		CRC = 60 D1
+--> FILE:  DISKSORT.C  		CRC = 6B AE
+--> FILE:  DISKSORT.MSG		CRC = EB 4E
+--> FILE:  MAKE    .C  		CRC = 5A 81
+--> FILE:  MAKE    .DOC		CRC = 1B F5
+--> FILE:  MAKEFILE.   		CRC = AC B7
+--> FILE:  MAKEFILE.DAT		CRC = C1 76
+--> FILE:  MAKEINC .C  		CRC = B8 0C
+--> FILE:  MYLIB   .SUB		CRC = 87 84
+--> FILE:  MYLIB   .REL		CRC = A5 64
+--> FILE:  NEW     .SUB		CRC = 05 24
+--> FILE:  STDIO   .H  		CRC = F2 97
+--> FILE:  TODO    .   		CRC = D8 C6
+--> FILE:  XXXMAIN .REL		CRC = F6 9F

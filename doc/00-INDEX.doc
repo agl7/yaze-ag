@@ -1,0 +1,23 @@
+Here is a brief Index of the documentation of yaze-ag
+
+	yaze.1		use "man yaze" (Yet Another Z80 Emulator by AG)
+	cdm.1		use "man cdm"  (CP/M disk manager)
+
+	yaze.doc	the complete documentation of yaze
+	yaze-ag.doc	describes only the new features of yaze-ag-2.20
+
+	README-1.10	Readme to version 1.06 and 1.10 (describes the
+			features of yaze)
+
+	README-2.20	Readme to version yaze-ag-2.20 (this version)
+
+	README_BIOS3_Z80  describes all Z80 source files of the CP/M 3.1
+			  BIOS
+
+	README_BOOTSYS    a brief description of the new CPM3.SYS loader
+			  BOOTSYS because CPMLDR does not work with the big
+			  CPM3.SYS which is used in yaze-ag.
+
+	INSTALL-2.20	describes the install prozess of yaze-ag-2.20
+
+	COPYING		a copy of the GNU GENERAL PUBLIC LICENSE

@@ -1,0 +1,16 @@
+mount a disks/BOOT_UTILS_windows.ydsk
+mount b disks/CPM3_SYS.ydsk
+#m c ./disksort
+#mount d disks/DISKSORT.ydsk
+#mount f disks/ZINC.ydsk
+#mount g disks/TEST-UTILS-1.10.ydsk
+#mount h disks/HI-C-Z280-Compiler.ydsk
+#mount i disks/UNIXLIKE.ydsk
+#mount j disks/MMU-Utils.ydsk
+#mount k disks/Kermit_SZRZ.ydsk
+#mount l disks/spl.ydsk
+#mount m disks/Turbo-Modula-2.ydsk
+#mount n disks/testdsk.ydsk
+#mount p disks/BIOS3.ydsk
+# attach aux /dev/ttyS0
+go

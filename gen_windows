@@ -1,0 +1,90 @@
+#!/bin/bash
+
+echo -e "\nWindows binaries generator\n"
+
+(uname | grep -i "cygwin") || { echo -e "This script runs only under the cygwin environment\n(unix-like environment for windows) !!!\n"; exit 1; }
+
+echo
+echo "running"
+
+dest=winbinaries
+
+# echo -e "\nremove directory $dest"
+# rm -rf $dest
+echo "create $dest and $dest/bin"
+mkdir $dest
+mkdir $dest/bin
+
+echo -e "\ncopy exe-files to $dest/bin"
+strip cdm.exe
+cp -v cdm.exe $dest/bin
+strip yaze_bin.exe
+cp -v yaze_bin.exe $dest/bin
+
+echo -e "\ncopy cygwin1.dll, mintty.exe, stty.exe and other DLLs to $dest/bin"
+cp -v /bin/cygwin1.dll $dest/bin
+cp -v /bin/cygintl-8.dll $dest/bin
+cp -v /bin/cygiconv-2.dll $dest/bin
+cp -v /bin/cygwin-console-helper.exe $dest/bin
+cp -v /bin/mintty.exe $dest/bin
+cp -v /bin/stty.exe $dest/bin
+
+echo -e "\ncopy batch file to $dest"
+cp -v yaze.bat $dest
+echo -e "\ncopy boot files to $dest/bin"
+cp -v yaze-cpm3.boot yaze.boot $dest/bin
+
+echo -e "\ncopy keytranslation files to $dest/bin"
+cp -v *.ktt $dest/bin
+
+echo -e "\nBegin copy disks to $dest/bin/disks"
+mkdir $dest/bin/disks
+for ydsk in `cat doc_ydskfiles_windows.txt` ; do
+   cp -v $ydsk $dest/bin/disks/$ydsk
+done
+
+echo "copy disksort to $dest/bin"
+cp -av disksort $dest/bin
+
+echo "copy .yazerc_winbinaries to $dest/bin/.yazerc"
+cp .yazerc_winbinaries $dest/bin/.yazerc
+
+echo "End copy disks"
+
+
+# echo -e "\nBegin copy documentation"
+# mkdir $dest/doc
+# for dfile in `cat docfiles.txt` ; do
+#    cp -v $dfile $dest/doc
+# done
+# echo "End copy documentation"
+
+echo -e "\nBegin copy HTML documentation"
+mkdir $dest/doc_html
+for dfile in `cat docfiles_html.txt` ; do
+   cp -v $dfile $dest/doc_html
+done
+
+echo -e "\nBegin copy HTML version of HELP.HLP"
+mkdir $dest/doc_html/cpmhelp
+for dfile in `cat doc_cpmhelp_html.txt` ; do
+   cp -v $dfile $dest/doc_html/cpmhelp
+done
+echo "End copy HTML documentation"
+
+echo -e "\ncopy metapad to $dest"
+cp -v metapad.exe metapad.ini $dest
+
+echo -e "\ncopy md5summer to $dest"
+cp -v md5summer.exe $dest
+
+echo -e "\ncopy .minttyrc to $dest/bin"
+cp -v .minttyrc $dest/bin
+
+echo -e "\ngenerate md5 checksumms"
+cp md5summer.exe $dest
+cd $dest
+rm yaze.md5
+find . -type f -exec md5sum -b {} >>../yaze.md5 \;
+cd ..
+mv yaze.md5 $dest

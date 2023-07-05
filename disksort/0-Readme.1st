@@ -1,0 +1,150 @@
+
+
+What is the DISKSORT project?
+==============================
+
+Disksort is a defrag tool for CP/M, like SPEEDDISK (by Norton) or DEFRAG in
+Windows!!!
+
+The project is written in C and runs only in a CP/M TPA. It uses no temp
+files. It has restrictions concerning the disksize of CP/M-disks.
+Disks with 4-5 MB of files will be sorted!
+
+I have tested the project very thoroughly from within YAZE-AG and, to my
+opinion, it runs quite nicely with no error in CP/M 3.0/2.2 (Do keep in mind,
+that YAZE-AG is a actually a CPU-emulator and is the base to runs an original
+CP/M 3.0 (I use the free BDOS3-replacement "ZPM3" of Simeon Cran) or, so far,  
+the CP/M 2.2 BDOS-replacement "SUPERDOS").
+
+--> Use Disksort on your own real CP/M computer at your own risk. 
+--> OK, I warned you, and cannot be held liable for any damage done!!! 
+
+Disksort is for both CP/M 2.2 and CP/M 3.1.
+
+If the TPA is reduced, this will also reduce available memory space to
+Disksort, thus the disksize it can sort, will be reduced!!!
+
+The Author of the project is a fellow student. He allowed me to pass the
+software and the contents of the project to any CP/M user.
+
+
+About the Project:
+==================
+
+Although I said Disksort is written in C, let me state, it does NOT use the 
+HI-C-Compiler, but the German MI-C Compiler, which is a commercial product.
+
+The project demonstrats some of  the specialties of YAZE-AG in handling
+(Unix-/Windows-) directories, that can be mounted to a CP/M drive-letter.
+The sources are kept in a directory on Unix (or Windows) and this directory
+is usually connected to Drive C: (You can change this, if you like, but then
+you have to change the disks specifikations at the beginning of the Makefile
+"DISKSORT.MAK"). 
+
+YAZE-AG also imports the Windows/Unix time stamps of the files into the
+simulated CP/M drive!!! 
+
+That way, you can use a Make-Utility (see MAKE.COM on drive A: (BOOT_UTILS)) 
+to compile the project.
+
+You can edit the source files under Unix/Windows with any editor 
+and compile the source inside the CP/M inside YAZE-AG !!!
+
+(You can use VI or any another editor which supports CP/M (or DOS) format
+ --> CR-LF; my faforite editors are "nedit" and "vi" under Unix/Solaris/Linux
+ and metapad (http://liquidninja.com/metapad/) under Windows)
+
+On drive D: (mounted to diskfile DISKSORT.dsk) there are all utilities and
+the MAKEFILE to compile the whole project. The Compiler is added but only the
+executable of the C-Compiler (CCZ.COM) itself. The compiler uses its own linker
+format but it can also use the standard REL-Format.
+
+In the Makefile DISKSORT.MAK,I added the compiler switches, so that the 
+project can be linked with L80 and I use a reduced library (MYLIB.REL) of 
+MI-C's C-Library.
+
+
+To Compile with the makefile "DISKSORT.MAK":
+============================================
+
+Drive D: (mounted to diskfile "DISKSORT.dsk") is reformatted with INITDIR and 
+I use  "Update Time Stamps" in the Label. 
+(in CP/M Plus, you can do this after using INITDIR by this command:
+ SET D: [name=DISKSORT,create=on,update=on] )
+
+This will baptize drive D: "DISKSORT" and activate the timestamps for both
+creation and update times.
+ 
+Keep in mind: the output files (REL-files) of the MI-C-Compiler can be only
+be put on "native" CP/M "diskfiles", since external, "mounted" directories
+will always mount R/O read-only. You can check the status of your disks by
+issuing the command "MOUNT" from the command line in CP/M.
+
+Drive C: with the source of the project is mounted to the
+Unix-(Windows-)Directory "./disksort/" and YAZE-AG  automaticaly will import
+the update time stamps of any file into the simulated CP/M drive !!!
+
+When you use one of the submit files "D.SUB" or "DD.SUB" or "DDD.SUB", be
+aware, that they contain the command line "make -f disksort.mak $1" to compile
+the project or to clean all files (with "d clean". "d" only compiles the
+project).
+
+I Recommend  reading section 7. "Mounting directories with Time Stamps" in
+yaze-ag.doc[.html], part of the documentation to YAZE-AG. There I describe in
+detail how you to make use of the feature "Mounting Directories" in YAZE-AG.
+And I describe the submit files the project uses.
+
+
+What does DISKSORT do exactly?
+==============================
+
+The performace is quite save. It will check the block CRCs of each file
+to verify, that the sorted content matches the original using the
+following steps:
+
+	1. Get CP/M Version:
+	   (The method to call BIOS is highly depending on this.)
+	2. Check target drive for CP/M Plus TIME Stamps.
+	   (If found, they will be used)
+	3. Sort of DIR-Entries in memory (TPA) to various criteria.
+	4. Create CRC of every file-block and store the result in CRC.SRT 
+           on the temp drive specified as parameter 2 
+           (Uses CRC16, that is also used by CRC.COM).
+	5. Write the new directory (when this has started, do not interrupt 
+           the program by any means, worst case would be a power failure!!!)
+	6. Sort files physically
+	7. Check file-block CRCs if it matches the original condition.
+	   In case of a positive result you should receive the (English)
+	   message:
+		"All files have exactly the same data as before sorting."
+		 "Disk sort successfully completed"
+
+
+Disksort Usage :
+====================
+
+	disksort a: b: [mode]
+
+	a: the target drive to be sortet 
+
+	b: Temporary drive to throw flowbydust on:
+		CRC.SRT     - File containing all block CRCs 
+		OLDDIR.SRT  - the former content of the directory
+	   On this drive, you also must keep the message-file DISKSORT.MSG !
+
+	mode: a number between  0 and 4 (if none given,  0 is assumed)
+
+		0: No screen outputs. Completely silent mode.
+		1: a few messages on memory usage and on the state of
+		    progress will be issued. This is my favourite.
+		2: Is for debugging. Will show detailed information,
+		    especially the two tables translate[i] and back[i].
+		3: Buildst CRC's across every block in each file listed in
+		    CRC.SRT and compares them to the created CRCs.
+		    A "CRC-error" will report any mismatches.
+		4: Reports the uses of mode. The drive called as parameter
+		    "b:" must contain  DISKSORT.MSG.
+
+   
+March 7th, 2005
+Andreas Gerlich   (Andreas.Gerlich@mathematik.uni-ulm.de)

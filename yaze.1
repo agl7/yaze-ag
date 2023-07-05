@@ -1,0 +1,332 @@
+.TH YAZE-AG 1 2022-02-16 2.51.3 "Frank, John Saxton and AGL Hacks"
+.SH NAME
+yaze\-ag \- yet another z80 emulator by ag
+.SH SYNOPSIS
+.PU
+.ll +8
+.B yaze
+.RB [ -1 ]
+.RB [ -v ]
+.RB [ -b\fIbootfile ]
+.RB [ -l\fIloadadr ]
+.RB [ -p\fIbasepage ]
+.RB [ -s\fIstartup ]
+.RB [ -z\fIZ3ENV ]
+.I command...
+.ll -8
+.br
+.B cpm
+.I ...
+.br
+.B z80
+.I ...
+.br
+.SH DESCRIPTION
+.B yaze-ag
+has been designed to provide an exact simulation of the Z80 microprocessor
+on a Unix system. In addition to the instruction set emulator, a
+CP/M basic i/o system is provided that can reference Unix directories
+and Unix files containing images of CP/M disks.  When a genuine CP/M
+operating system (ccp + bdos) or a clone system is loaded into the
+emulator, a complete CP/M system is available, running on a
+.br
+Unix-/Linux-/RaspberryPi-/Mac-/Windows-Host.
+
+.B yaze-ag-2.51.3
+is a further development of yaze-1.10. New in yaze-ag is
+the emulated Memory Management Unit (MMU) and the BIOS that supports
+CP/M 3.1 or ZPM3 (boot file yaze-cpm3.boot) which is used in yaze-ag.
+You can still run the CP/M 2.2 replacement "SuperDos" (boot file
+yaze.boot) in yaze-ag if you want.
+.br
+
+New in version
+.B 2.40.5
+was the key translation module. So you can use e.g. the cursor
+keys and function keys in the CP/M command line or when Wordstar
+is running. Look at the files $HOME/cpm/*.ktt on the host.
+.br
+
+New in version
+.B 2.51.1
+was the possibility to define a clock rate. This allows
+you to run the emulator e.g. with 4.0 MHz.
+.br
+Further there is a "window size handler" in the binary of yaze-ag. This
+handler determines the coordinates of the used Terminal emulator (e.g. xterm,
+gnome-terminal, mintty (Cygwin/Windows), ...). So the lines and columns
+variables in the System Control Block (SCB) of CP/M-3 are set by this handler.
+The patched Wordstar 4.00 (see drive A:) and the CP/M-3-Utilities
+(e.g. TYPE.COM, 3DIR.COM, DIR.COM, ...) uses this two variables
+in the SCB via the standardized BDOS3-Interface (call to 0005H) to
+setup the screen.
+.br
+Further you can test the speed of the Z80 core with the submit file
+"A:TESTZEX.SUB". It runs ZEXALL.COM and measure up the time how it's need and
+prints the speed at the end of the submit file.
+.br
+
+New in version
+.B 2.51.2
+is the Macro Assembler "ZSM4". It's a Z80/Z180/Z280 Assembler. The licence is
+the GPLv2 (GNU GENERAL PUBLIC LICENSE Version 2, June 1991).
+The project page is "https://github.com/hperaza/ZSM4". The source files
+of this Assembler can be mounted on drive O:. This Assembler is now the
+standard for assemble BOOTSYS and the BIOS3-Z80-files for YAZE-AG
+(see drive P:).
+.br
+Further with the flag "-?" you can print the usage, the features of yaze-ag
+and at last it prints the copyright report.
+
+New in version
+.B 2.51.3
+is "BOOTSYS version 2.00". When you call BOOTSYS.COM it tries to open
+A:CPM3.SYS.
+Where A: is the drive which is defined as the default drive in BOOTSYS.MAC
+(see drive P:).
+.br
+You can define a drive as a parameter (e.g. "bootsys p:" (the colon ist
+necessary)). BOOTSYS tries to open CPM3.SYS on that drive.
+After load of CPM3.SYS
+it relocates CPM3.SYS and starts CP/M 3.1 (cold boot).
+.br
+An another way to load CPM 3.1 is to generate a CPM3.COM with the following
+command:
+
+             A>pip cpm3.com=bootsys.com,cpm3.sys
+
+You simple append CPM3.SYS after BOOTSYS.COM and save both in CPM3.COM.
+When you call CPM3.COM BOOTSYS tests if a CPM3.SYS is appended and relocates
+at once CPM3.SYS and starts CP/M 3.1 (cold boot).
+.br
+The boot file "yaze-cpm3.boot" which is load when you start YAZE-AG is
+identical with A:CPM3.COM.
+
+.B yaze
+is a shell script. It is used to start yaze-ag.
+It first tests if the startup file
+.B .yazerc
+is in the
+current directory. If there is one, it immediately starts
+.B yaze_bin
+the binary of the Z80 emulator.
+.br
+If .yazerc does not exist, it tests if the directory $HOME/cpm exists.
+If not, it creates $HOME/cpm. Then it copies some yaze-disks-files (.ydsk)
+to $HOME/cpm
+which are necessary for running yaze-ag with CP/M 3.1 or ZPM3.
+Then it creates $HOME/cpm/doc_html and sets links to the
+complete documentation in this directory.
+This only happens if the directory $HOME/cpm does not exists.
+.br
+Finally, it changes to $HOME/cpm and starts
+.B yaze_bin.
+This is done every time you start the shell script yaze and if .yazerc
+is not present in the current directory.
+
+yaze\-ag can also be started with
+.B z80
+or
+.B cpm.
+They are symbolic links to the shell script yaze.
+
+The older documentation is contained in the file yaze.doc (version yaze-1.10)
+and the new features until yaze-ag-2.51.3 describes the file yaze-ag.doc
+.br
+(see $HOME/cpm/doc_html/index.html).
+.SH OPTIONS
+.TP
+.B -?
+prints the Usage, the Features and the Copyrights.
+.TP
+.B -1
+set sector size to 128 bytes for all disks (only CP/M 3.1). 
+
+If you create a disk file under the yaze-ag monitor or with the cdm(1)
+utility and you use the default sectors per track (see create) the
+sector size is also set to 2048 bytes (only CP/M 3.1).
+
+If you use software like a disk edit utility under CP/M 3.1 it can be
+necessary to set the sector size to 128 bytes.
+
+See also the monitor command
+.B 128
+above in the section MONITOR COMMANDS.
+.TP
+.B -v
+causes a summary of the system configuration to be displayed after
+loading.
+.TP
+.B -b
+gives the name of a file to be loaded into the emulated processor's
+ram before the emulation is started.  The file is loaded at the
+address given by the \fB-l\fR option, if one is present, or else at
+the basepage (see \fB-p\fR).  If a boot file is not specified with the
+\fB-b\fR option, yaze-ag looks firstly for the file yaze-cpm3.boot in
+the current directory, then in /usr/local/lib/yaze to boot CP/M 3.1.
+If yaze-ag is compiled without the flag -DBOOTSYS yaze-ag looks for the
+file yaze.boot (instead of yaze-cpm3.boot) to boot the CP/M 2.2 replacement
+Superdos.
+.TP
+.B -l
+the hexadecimal address at which to load and start the bootstrap file,
+if a separate bootstrap is necessary.
+
+If you want to run CP/M 2.2 while yaze-ag is compiled to load yaze-cpm3.boot
+(CP/M 3.1) you can start yaze-ag with the following options:
+
+.B yaze -l -1 -b yaze.boot
+.TP
+.B -p
+the top 2 hex digits of the location of the CP/M console command
+processor (CP/M 2.2).  Also the location to which boot file is loaded if a
+\fB-l\fR option is not present.
+.TP
+.B -s
+a file containing monitor commands that are to be executed before
+starting the emulator.  If no \fB-s\fR option is present, .yazerc from
+the current directory or from the user's home directory ($HOME/cpm) is taken.
+.TP
+.B -z
+the hexadecimal address in the emulated processor's ram of a 1KByte
+area that should be reserved for use by an extended CP/M clone such as
+ZCPR3.
+.SH MONITOR COMMANDS
+When the emulator is started it executes commands first from the
+startup file \fB".yazerc"\fR, then from the tail of the command line
+(any strings
+which follow the options) and then from the tty if neither the startup
+file nor the command line included a "go" command.  Control can be
+returned to the monitor by executing the CP/M sys.com command or, if
+yaze was compiled with -DDEBUG, by sending it a SIGINT signal.
+
+Command names can be shortened to unique abbreviations.  If
+\fByaze-ag\fR was compiled with GNU Readline, command-line editing,
+filename completion and history recall are available - see the
+readline documentation.
+
+The monitor commands are described with more details in the file
+yaze.doc. The new commands '128' and 'clock' are described in yaze\-ag.doc.
+.br
+.TP
+.B help
+Display a command list
+.TP
+.B help \fIcmd\fR
+Give details about \fIcmd\fR
+.TP
+.B attach
+Attach CP/M device to a Unix file/device
+.TP
+.B clock
+Display and set the clock rate
+
+Without a parameter it displays the current clock rate. With a parameter (for
+example 4000 for 4.0 MHz) the clock rate will be set. The parameter "0" returns
+to "max speed".
+.br
+If you want to set a permanent clock rate you can put a clock command
+into the yaze-ag startup file $HOME/cpm/.yazerc.
+.TP
+.B detach
+Detach CP/M device from file
+.TP
+.B setaccess
+Turns on/off access time stamps for mounted directories
+.TP
+.B mount
+Mount a Unix file or directory as a CP/M disk
+.TP
+.B remount
+Remount a CP/M disk
+.TP
+.B umount
+Unmount a CP/M disk
+.TP
+.B create
+Create a new disk
+.TP
+.B 128
+Set sector size to 128 for all disks (only CP/M 3.1).
+To reverse this option you have to restart yaze-ag.
+.TP
+.B interrupt
+Set user interrupt key
+.TP
+.B go
+Start/Continue CP/M execution
+.TP
+.B !
+Execute a Unix command
+.TP
+.B quit
+Terminate yaze
+.TP
+.B time
+Display elapsed time since last `time' command
+.SH SUPPORTED OPERATING SYSTEMS
+Yaze-ag-2.51.3 can be compiled under all unix or unix-like operating
+systems.
+
+yaze-ag-2.51.3 are tested with:
+.TP
+.B Solaris
+cc and gcc (SparcV9 and X86_64)
+.TP
+.B Linux
+gcc (x86_64, x86_32, ARM6, ARM7 and ARM8)
+.TP
+.B Raspberry Pi OS (Linux, Debian)
+Raspberry Pi 1          (ARM1176JZF-S, single core, 32 bit)
+.br
+Raspberry Pi 2 model B  (Cortex-A7, quad core, 32 bit)
+.br
+Raspberry Pi 3 model B  (Cortex-A53, quad core, 32 & 64 bit)
+.br
+Raspberry Pi 3 model B+ (Cortex-A53, quad core, 32 & 64 bit)
+.br
+Raspberry Pi 4 model B  (Cortex-A72, quad core, 32 & 64 bit)
+.TP
+.B FreeBSD
+clang (OPNsense)
+.TP
+.B MacOS-X
+gcc ?
+.TP
+.B Cygwin
+gcc (have a look to www.cygwin.com)
+.br
+Cygwin is a unix-like environment for windows.
+.br
+The "Standalone Binaries for Windows" are produced with Cygwin.
+.SH SOURCE AND BINARIES
+You find the source (for all systems) and the binaries for windows (if
+you don't want to install the cygwin environment) with following URLs:
+
+http://yaze-ag.de
+
+or
+
+http://www.mathematik.uni-ulm.de/users/ag/yaze-ag/
+.SH SEE ALSO
+.B cdm(1)
+.SH AUTHORS
+.TP
+.B Frank D. Cringle
+(E-Mail: fdc (at) cliwe (dot) ping (dot) de)
+.br
+(Copyright (c) 1995,1988 until yaze-1.10, CP/M 2.2)
+.TP
+.B Jon Saxton
+He passed at June 15, 2015 after a tough battle with cancer.
+.br
+(Keytranslation Copyright (c) 2000,2015 by Jon Saxton)
+.TP
+.B Andreas Gerlich
+(E-Mail: development (at) yaze-ag (dot) de)
+.br
+(MMU, CP/M 3.1 and other  extensions Copyright (c) 2000,2022 by
+Andreas Gerlich, since yaze-1.10 until version yaze-ag-2.51.3)
+.SH LICENSE
+The License of this Open Source Project is the GPLv2 (GNU GENERAL
+PUBLIC LICENSE Version 2, June 1991). For details see the file COPYING.

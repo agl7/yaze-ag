@@ -1,0 +1,168 @@
+-	R und W Utility
+
+- DONE!	DOKU: in yaze.doc.html muss 2.10 eingetragen werden (am Angang und am
+								Ende)
+-	PMARC neue Version mit CP/M 3 Time Stamps einspielen
+-	neue Version vom ZINC-Project holen
+- DONE!	BOOTSYS neue Version einspielen (von specht)
+
+-	DISKSORT-PMA's erstellen: Eines mit dem Originalversion und eine
+	ins englisch uebersetzte version.
+		ds-orig.pma	(original in Deutsch)
+		disksort.pma	(ins englisch uebersetzte version)
+	Eine web seite erstellen mit CP/M software. Hier das DISKSORT
+	Projekt beschreiben und die zwei archive ablegen.
+		eventuell crc.com hier ablegen
+
+	ACHTUNG: Ich hab bereits einen Link in yaze-ag.doc hinterlegt
+		 auf den das DISKSORT Projekt beschrieben sein soll.
+
+-	patch3 Version erstellen
+
+-	Eine Version fuer Sun workshop erstellen (schwierig ?)
+
+- DONE!	date/time informationen darstellen von unix files, wenn eine
+	unix directory an ein CP/M Laufwerk gebunden ist.
+
+-	Idee: Directory automatisch einlesen lassen
+	Wie? Ueber semaphore ?
+	Es muessten 2 Prozesse dann laufen. Einer im Hintergrund der
+	die Directory updatet und eine Semaphore benutzt um yaze im 
+	Vordergrund so lange zu unterbrechen bis ein reread durchgefuehrt
+	wurde.
+
+- DONE!	__EXTENSION__ raus tun aus allen Quellen
+	(auskommentiert ... muss noch bereinigt werden)
+
+- DONE!	neues sys.z80/com auf BOOT_UTILS ... uebernehmen in die neue Version
+
+-	Nachsehen ob dp->dph auf 0 gesetzt wird wenn ein umount
+	durchfeguehrt wird bzw. ungemounted ist.
+	(in setup_cpm3_dph_dpb nachsehen)
+	nicht mehr notwendig da seldsk 0 zurueck gibt wenn Disk not aktive
+
+-	simz80: ED 71  out (c),(HL) sollte es sein es ist aber out (c),0
+
+-	simz80.c: Die verschiedenen out-Befehle berichtigen aus yaze-1.12
+
+- DONE!	Nach einem CTRL-C (bzw. disk reset) wird SELDSK mit einem speziellen
+	Modus ("First select") aufgerufen. Dieses kann benutzt werden
+	um ein reread der Unix-Directory zu machen.
+	Andere Idee: Bei jedem Warmboot ein reread aller unix-Directories
+	zu machen.
+	Idee: Utility reread mit options show (zeigt alle Laufwerke und
+		deren Directory an die remountet wird) und noshow(default)
+
+	reread show/noshow/warmboot/normal
+
+- DONE! Doppelte Directoryeintraege in der CP/M-Directory wenn z.B.
+	zwei Dateien die die Namen "Source.z80" und "source.z80" haben.
+
+- DONE!	unter Windows macht MMUPRINT einen Zeilenwechsel 
+	im 80 Zeichen --> nur bis 79 Zeichen schreiben
+
+- DONE! change the WWW-Adresses in HELP.HLP
+
+- DONE! Multi-I/O
+
+- DONE! PSH in eine eigene Variable ablegen fuer Berechnung.
+
+- DONE! SSSD Disks (translation table ?)
+
+- DONE! dp->dph und dp->dph3 in dp->dph vereinen
+
+- DONE! mount umbauen in monitor.c damit unter CP/M 3.1 auch
+	gemounted/ungemounted werden kann.
+	IDEE: Routine die aus dem 128-Byte-Buffer (buf) alle notwendigen
+	      Parameter fuer CP/M 3.1 uebertaegt.
+
+- DONE! Grosse for-Schleife in bios.c (function nummer 0xE0) durch eine
+	kleine ersetzten und eine Funktion.
+        BEACHTE: /- CKS (Checksum size) wird bisher ueberschrieben, kein
+        DONE! -+ - kopieren mehr des gesammten DPB's sondern einzeln "anfassen"
+		 \- und einzeln kopieren !!!
+
+- DONE "showmount" in monitor.c so umschreiben damit CP/M 3.1 DPH's/DPB's
+	angezeigt werden.
+
+- DONE	Directories mounten unter CP/M 3.1
+
+- DONE	Filemodes (__S_IFMT) mit dem original vergleichen wie es dort
+	gemacht ist und wieder rueckgaengig setzten.
+
+- DONE	PSH,PSM setzten (Sektorgroesse) (siehe naechten Punkt)
+
+- DONE	default Anzahl sector in DPB: 128 logical (128 bytes) sektors
+  --> Versionsfuehrung fuer Disks einfuehren.
+	fehlt diese (0) --> immer 128 Byte Sektoren
+	ansonsten (1) --> die Eintellungen der Sektorgroesse entsprechend
+		      der Angaben in der Diskfile uebernehmen
+
+- DONE Filegroesse ueberpruefen :
+	DSM fuer  8 MB bei Blocksize 2K : 4096-1
+	DSM fuer 16 MB bei Blocksize 4K : 4096-1
+	Also darf DSM nie groesser als 4096-1 sein! (egal welche Blocksize)
+
+- DONE Directory entries ueberpruefen
+	DRM (maxdrm) darf nie groesser als 2048-1 sein !
+
+- DONE Flag mit dem 128 Byte-Sektoren erzwungen werden
+
+- DONE SYS.COM utility:
+	Wenn CP/M 2.2 laeuft immer reset disk fuer alle disks machen.
+	Wenn CP/M 3.1 laeuft, kein reset der disks da alles ueber @MEDIA
+			und das MF flag in den DPH's laeuft.
+
+- DONE Wenn kein drive A: definiert ist sollte beim Versuch den CCP.COM zu laden
+  in den monitor gegangen werden um drive A: neu zu definieren.
+  (Geht wenn ein drive A: definiert ist aber kein CCP.COM vorhanden ist)
+
+- DONE alle Aenderungen von simz80.c nach simz80.pl transferieren.
+
+- DONE Alle Neuerungen in cdm uebernehmen (versionskennung, sektor size)
+
+- DONE yaze.1 editieren (anpassen an CP/M 3.1)
+
+- DONE cdm.1 editieren (anpassen an CP/M 3.1)
+
+- Makefiles erneuern (DOC und DISTRIBUTION)
+
+- DONE yaze-ag.doc eventuell editieren (anpassen an CP/M 3.1)
+	- Disk format
+	- Kapitel "Following files are in the package"
+		ergaenzen/verfollstaendigen
+        - auch die Erweiterungen des mount-Befehls erklaeren.
+
+- DONE shell script "yaze":
+	- auch nachpruefen ob es yaze.bin n `pwd` gibt und dieses ausfuehren
+	  bevor der $PATH abgesucht wird.
+	  (Grund: Wenn yaze-ag installiert wurde wird /usr/local/bin/yaze.bin
+		in der Regel vor ./yaze.bin gefunden und gestartet. Es sollte
+		aber ./yaze.bin vorrangig ausgeführt werden.)
+
+- DONE Install durchfuehren und dabei eine yaze.sh zu yaze machen und
+	yaze zu yaze.bin.
+	Loesung: Es wird ein Link von yaze -> yaze.sh beim Übersetzten gesetzt.
+
+- In INSTALL-2.00 beschreiben was "make install" alles macht um wegen den
+  links vor zu warnen.
+  Die WWW + FTP - Adresse hier hinterlegen.
+
+- Changelog updaten
+
+- Alle disks mit der Kennung ".ydsk" umbenennen.
+
+- VERWORFEN Kommentar in die erste 128 Byte einer Disk file mit einbauen.
+
+- I/O-Byte nur einmal beim BOOT setzen nicht bei jedem Warmboot.
+- I/O-Byte aus bank 1 holen bei cpm3
+
+- character devices
+
+- nachsehen ob io.c noch funktioniert
+
+- Dokumentation in English
+
+- mount.z80 : auch fuer CP/M 2.2 lauffaehig machen
+
+- DONE zsm4.5-source.ydsk in allen Makefiles ändern

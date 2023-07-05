@@ -1,0 +1,126 @@
+<html>
+
+<head>
+<meta http-equiv="content-type" content="text/html;charset=iso-8859-1">
+<title>cdm.1</title>
+
+<style type="text/css">
+<!--
+body { margin-left:30px; margin-top:20px; margin-right:30px;
+	background-color:#FFFFC8; color:#000000 }
+li { margin-bottom:15 }
+
+a:link { font-weight:bold; color:#0000E0; text-decoration:none }
+a:visited { font-weight:bold; color:#000080; text-decoration:none }
+a:hover { font-weight:bold; color:#FF0000; text-decoration:none }
+a:active { font-weight:bold; color:#E00000; text-decoration:underline }
+a:focus { font-weight:bold; color:#00E000; text-decoration:underline }
+
+p	{ margin-bottom:15px }
+.no_b	{ margin-bottom: 0px }
+.no_bt	{ margin-bottom: 0px; margin-top: 0px }
+.no_t	{ margin-top: 0px }
+//-->
+</style>
+
+</head>
+
+<body>
+<pre>
+
+
+cdm(1)			  Local commands		   cdm(1)
+
+
+<b>NAME</b>
+       cdm - CP/M disk manager
+
+<b>SYNOPSIS</b>
+       <b>cdm</b> file...
+
+<b>DESCRIPTION</b>
+       <b>cdm</b>  gives access to the CP/M disk images used by <b><a href="yaze.1.html">yaze(1)</a></b>.
+       With <b>cdm</b> you can create disks, copy files to and from  the
+       Unix file system, list files and erase files from the CP/M
+       disk.
+
+<b>OPTIONS</b>
+       Any files listed on the <b>cdm</b> command line are taken  to  be
+       existing CP/M disk files and they are mounted successively
+       to drive A, B, C, ... etc.
+
+       The format of CP/M disk files (&lt;CPM_Disk&gt;) is described in
+       yaze.doc and yaze-ag.doc.
+
+<b>INTERACTIVE COMMANDS</b>
+       The  interactive	 interface to <b>cdm</b> mimics an extended CP/M
+       clone.  The current disk and user  number  appear  in  the
+       prompt  and  can	 be changed by entering DU: as a command,
+       where D is any mounted disk letter (a .. p)  and	 U  is	a
+       user  number  (<b>cdm</b>  allows  0  ..  31, although you should
+       restrict yourself to numbers under 16 to remain compatible
+       with CP/M).
+
+       DU: can also be prefixed to any filename, to indicate that
+       it is not on the current disk/user.  Two pseudo disks  can
+       be  referenced  in the <b>copy</b> command: u and t.  These refer
+       to files in the Unix file-system.  `u:file'  refers  to	a
+       binary  Unix file and `t:file' refers to a text Unix file.
+       The difference  is  that	 u:  files  are	 copied	 verbatim
+       whereas	t: files undergo CRLF and ^Z processing appropri&minus;
+       ate for the copy direction (to or from CP/M).
+
+       Command names can be shortened to a  unique  abbreviation.
+       If  <b>cdm</b> was compiled with GNU Readline, command-line edit&minus;
+       ing, filename completion and history recall are	available
+       - see the readline documentation.
+
+       <b>help</b>   Display a command list
+
+       <b>help</b> cmd
+	      Give details about cmd
+
+       <b>mount</b>  Mount a Unix file as a CP/M disk
+
+       <b>umount</b> Unmount a CP/M disk
+
+       <b>dir</b>    Display directory
+
+       <b>ls</b>     Synonym for `dir'
+
+       <b>era</b>    Erase CP/M file(s)
+
+       <b>cp</b>     Copy one or more files (use wildcards)
+
+       <b>rename</b> Rename a CP/M file
+
+       <b>type</b>   Pipe a text file through $PAGER
+
+       <b>create</b> Create a new disk
+	      (modified	 by  Andreas Gerlich to create files with
+	      sektor size 2048 bytes to use under CP/M 3.1)
+
+       <b>!</b>      Execute a Unix command
+
+       <b>quit</b>   Terminate cdm
+
+
+
+<b>SEE ALSO</b>
+       <b><a href="yaze.1.html">yaze(1)</a></b>
+
+<b>AUTHORS</b>
+       Frank D. Cringle
+       Carl Mascott
+       Andreas Gerlich
+       <font size="+1">only text emails please: <img
+       src="e_mail_yaze-ag.png" align="middle"> (SPAM-Account)</font>
+
+
+
+Frank/Carl/AGL  Hacks	 20. September 2020
+
+</pre>
+</body>
+
+</html>

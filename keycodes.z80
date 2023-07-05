@@ -1,0 +1,197 @@
+;----------------------------------------------------
+; Project: keycodes.zdsp
+; Main File: keycodes.asm
+; Date: 21-10-11 19:28:36
+;
+; Created with zDevStudio - Z80 Development Studio.
+;
+;----------------------------------------------------
+;
+;	keys.z80
+;
+;	A program to report every keypress.
+;	Quit by pressing ESC twice in succession.
+;
+;----------------------------------------------------
+
+	.Z80		; (For M80's benefit)
+	aseg
+	org	100h
+
+ESC	equ	1Bh
+bdos	equ	5
+cr      equ     13
+lf      equ     10
+
+start:
+	ld	hl,0
+	add	hl,sp
+	ld	(stack),hl
+	ld	sp,stack-2
+charloop:
+;	call	blankit		; Prepare the print buffer
+	call	getch		; Get a keystroke
+	push 	af		; Save it
+	call	printch		; Display it in all its forms
+	pop	af		; Recover the character
+	ld	hl,escapes	; Point at termination counter
+	cp	esc		; Was the key an ESCape?
+	jr	z,countDown	; Yes, go and check the counter
+	ld	(hl),2		; No, reset the counter
+	jr	start
+countDown:
+	dec	(hl)
+	jp	z,0		; Exit if we've seen ESC ESC
+	jr	charloop
+
+getch:
+	ld	c,6		; Direct console input function
+	ld	e,0FDh		; Wait for a character
+	call	bdos		; Character comes back in A and L
+	ret
+
+; Blank-fill the print area
+blankit:
+	ld	hl,linebuf
+	ld	de,linebuf+1
+	ld	bc,bufsize-1
+	ld	(hl),' '
+	ldir
+	ret
+
+printch:
+	ld	(char),a	; Save character to be printed
+	ld	de,linebuf	; Point at print buffer
+	push	de
+	call	blankit
+	pop	ix		; Print buffer pointer
+        ld      a,(char)
+	cp	7Fh		; Check for DEL
+	jr	z,nocaret
+;	ld	(ix+1),a	; Put into print buffer
+        cp      20h             ; See if it is a control character
+        jr      nc,nocaret      ; Skip if not
+        ld      (ix+0),'^'      ; Emit caret
+        add     a,'@'           ;  followed by letter
+        ld      (ix+1),a
+nocaret:
+	ld	a,(char)
+        inc     a               ; Arrange to print 00 to 1F and 7F
+        and     7Fh             ; as a name
+        cp      21h		; Check limit
+        jr      nc,raw		; Skip if out of range
+        ld      b,a
+        add     a,b
+        add     a,b
+        ld      hl,chars
+        ld      e,a
+        ld      d,0
+        add     hl,de
+        ld      bc,3
+        ld      de,name
+        ldir
+        jr      doHex
+raw:
+        dec     a               ; Print character as-is
+        ld      (ix+(name-linebuf+1)),a
+doHex:
+	ld	a,(char)
+        ld      hl,ohex         ; Print character as two hex digits
+        call    print8
+	ld	a,(char)
+	jr	putDec8
+
+print16:
+	push	hl		; Save number for second pair
+	ld	a,h		; Load first pair
+	call	print8		; Print pair
+	pop	hl		; Recover number
+	ld	a,l		; Load second pair
+print8:
+	push	af
+	srl	a
+	srl	a
+	srl	a
+	srl	a
+	call	print4
+	pop	af
+print4:
+	and	0Fh
+	ld	e,'0'
+	cp	10
+	jr	c,pr
+	ld	e,'A'-10
+pr:	add	a,e
+	ld	(hl),a
+	inc	hl
+	ret
+
+;----------------------------------------------
+; putDec8
+;
+; Prints an 8-bit unsigned number in decimal.
+; Number to be printed is in A register.
+;----------------------------------------------
+
+putDec8:
+	ld	d,a		; Number to be printed
+	ld	hl,odec+2
+	ld	e,10		; Divisor
+digit:
+	ld	b,8		; Loop counter
+	xor	a		; Clear remainder
+divLoop:
+	sla	d
+	rla
+	cp	e
+	jr	c,cont
+	sub	e
+	inc	d
+cont:
+	djnz	divLoop
+
+	; Now the quotient is in D ready for the next iteration and
+	; the remainder in A is the digit to be printed.
+
+	dec	hl		; Where to put digit
+	add	a,'0'		; Make it displayable
+	ld	(hl),a		; Store for display
+	ld	a,d		; Anything left?
+	or	a
+	jr	nz,digit	; Next digit
+
+	; HL points at the string to be displayed which is fine if
+	; we don't want a space-filled fixed length string.
+
+	ld	de,linebuf	; Buffer pointer to DE for BDOS
+	ld      c,9
+        call    bdos
+	ret
+
+escapes:
+        defb    2
+char:   defs    1
+
+;-----------------------------------------------------------------
+; Line buffer.  This gets blank-filled and then re-populated for
+; each character that is displayed.
+;-----------------------------------------------------------------
+
+linebuf:
+        defs    2               ; Printable character or ^representation
+        defs    2               ; Space
+name:   defs    3
+        defs    2
+ohex:   defs    2
+        defs    2
+odec:   defs    3
+bufsize equ     $ - linebuf
+        defb    cr,lf,'$'
+
+chars   defb    'delnulsohstxetxeotenqackbelbs tablf vt ff cr so si dle'
+        defb    'dc1dc3dc3dc4naksynetbcanem subescfs gs rs us'
+
+	defs	64		; 32-level stack
+stack:
+	defs	2
+	end

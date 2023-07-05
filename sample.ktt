@@ -1,0 +1,446 @@
+;----------------------------------------------------------------------------
+;
+;  Notes on keyboard translation
+;  -----------------------------
+;
+;  Modern keyboards typically generate scan codes which are interpreted
+;  by an operating system and translated into something more traditional.
+;
+;  In the environments which support yaze-ag, the operating system
+;  translates the scan codes for keys such as Home, Page Up, Insert
+;  and the arrow keys into multi-byte sequences which are not undersood
+;  by CP/M.
+;
+;  The primary purpose of the keyboard translation module in yaze-ag is
+;  to apply a secondary translation, converting the multi-byte sequences
+;  into something more useful to CP/M and its applications.
+;
+;  However there is a secondary purpose which is almost as important as
+;  the first, namely to prevent an untranslated multi-byte sequence from
+;  being passed to CP/M in the first place.  For example, on the 64-bit
+;  ubuntu on which I am writing these notes, pressing the up arrow key
+;  generates <esc>[A and F12 yields <esc>[24~ either of which could
+;  make a mess of a CP/M text editor.
+;
+;  The keyboard translation facility introduced in yaze-ag 2.3 allows
+;  a user to specify a set of key translations and to pass just those
+;  translated sequences to CP/M.
+;
+;  In the absence of a defined translation, yaze-ag 2.3 still works as
+;  always, except that no multi-byte sequences will get through.
+;
+;  You may treat this document as a sample keyboard translation.  Make
+;  a copy called yaze.ktt and edit it to contain just the key defin-
+;  itions that are useful to you.
+;
+;----------------------------------------------------------------------------
+;
+;  Format of the key translation file (yaze.ktt)
+;  ---------------------------------------------
+;
+;  Any line which does not start with an alphabetic character is considered
+;  to be a comment.  Leading and trailing spaces are ignored.
+;
+;  The general format is:
+;
+;	<key_description> = <character_sequence>
+;
+;  When the key described on the left is pressed, the sequence of characters
+;  listed on the right is sent to CP/M.
+;
+;  Key description
+;  ---------------
+;
+;  The key description comprises a single character or a key name which
+;  serves to identify the key.  This key descriptor may be accompanied by
+;  zero or more modifiers (control, alt, shift).  The order is not relevant
+;  and for key names case is ignored so that
+;
+;	Ctrl Shift PageUp
+;
+;  is the same as
+;
+;	shift pgUp CTL
+;
+;  Also, as seen in the foregoing example, some keys and modifiers have
+;  multiple spellings.
+;
+;  When using a single character key descriptor, case is preserved so that
+;
+;	Alt e		and		Alt E
+;
+;  are different, just as e and E are different.
+;
+;  Note that the = character cannot be used as a single character key
+;  descriptor.  Althougy you can say
+;	Alt / = ¨something¨
+;  you cannot say:
+;	Alt = = "something"
+;  but there is a way to express that via a key name:
+;	Alt eq = "something"
+;  or
+;	alt equals = ¨something¨
+;  (eq and equals are synonyms).
+;
+;  Keyboards other than US English can generate characters which do not fall
+;  into the range 0x00 to 0x7F.  In typical yaze-ag environments those keys
+;  yield UTF-8 sequences.  These are quite different from the ESC prefix
+;  sequences for function keys and cursor keys but the keyboard translator
+;  recognises UTF-8 sequences and converts them to the corresponding Unicode.
+;  So to translate a non-ASCII character to something usable in CP/M, just
+;  give the Unicode description
+;	U+nnnn
+;  where nnnn is the code point in hexadecimal notation.  (It doesn't have to
+;  be four digits long.)  Shift codes are meaningless in a Unicode context and
+;  they will be ignored.  Examples:
+;
+;  1.	u+20ac = "~"
+;  2.	U+E9 = 02
+;  3.	u+3a0 = "pi"
+;  4.   ctrl U+03A0 = "pi"
+;
+;  1 translates a Euro symbol to a tilde.
+;  2 translates a lower case e with an acute accent to a ^B
+;  3 translates the upper case pi character to a string "pi"
+;  4 is the same as 3.  The "ctrl" is ignored.
+;
+;  Character sequences
+;  ------------------
+;
+;  The character sequence sent to CP/M can be a string in "quote"
+;  marks, a control character name, a two-digit hexadecimal number
+;  or any combination thereof.  Strings are sent as coded.  Control
+;  character names and hexadecimal numbers are not case-sensitive.
+;
+;	F12 = "3dir" cr
+;
+;  will send all five characters to CP/M when F12 is pressed.
+;
+;  Further notes
+;  -------------
+;
+;  Certain keys and combinations of keys may be intercepted by the host
+;  operating system and not even passed into the translation engine. (SysRq
+;  and PrtSc are two examples.)
+;
+;  Some keyboard configurations distinguish between left and right Alt keys.
+;  This may mean that one of the Alt keys does not work the way you expect.
+;  It is probably not worth the trouble to try making the distinction in
+;  this system,  Just use the one that works.
+;
+;  If your CP/M session locks up it is most likely because some program is in
+;  a tight loop or (CP/M) memory has been scrambled.  Under such conditions it
+;  is useful to be able to interrupt CP/M no matter what it is doing.
+;
+;  Given that you cannot use the SysRq key to send anything meaningful to
+;  CP/M (because as mentioned above, SysReq is never seen by yaze-ag) choose a
+;  different key to interrupt CP/M at any time.  Pressing this key (or com-
+;  bination) will exit to the "sys" monitor.
+
+;  Examples might be:
+;	ctl alt bs
+;	ctl alt \
+;  but anything you fancy that shows up with the keytest program will be
+;  satisfactory.
+;
+;-----------------------------------------------------------------------
+;
+;	00 NUL	01 SOH	02 STX 	03 ETX	04 EOT	05 ENQ	06 ACK 	07 BEL
+;	  ^@	  ^A	  ^B	  ^C	  ^D	  ^E	  ^F	  ^G
+;
+;	08 BS 	09 HT 	0A LF 	0B VT 	0C FF 	0D CR 	0E SO 	0F SI
+;	  ^H	  ^I	  ^J	  ^K	  ^L	  ^M	  ^N	  ^O
+;
+;	10 DLE	11 DC1	12 DC2	13 DC3	14 DC4	15 NAK	16 SYN	17 ETB
+;	  ^P	  ^Q	  ^R	  ^S	  ^T	  ^U	  ^V	  ^W
+;
+;	18 CAN	19 EM	1A SUB	1B ESC	1C FS	1D GS	1E RS	1F US
+;	  ^X	  ^Y	  ^Z	  ^[	  ^\	  ^]	  ^^	  ^_
+;
+;	7F DEL	FF SRQ
+;
+;-----------------------------------------------------------------------
+;
+; A minimal set of key translations suitable for CP/M+ command editing
+; and basic WordStar use.
+;
+; Word processors and editors do their own keyboard input handling but
+; the CCP is just another application program (albeit a rather special
+; and important one) which gets input a line at a time calling BDOS
+; function 10.  To any program which does line input via bdos(10) ZPM3
+; presents a history of such inputs to the user for possible recall and
+; editing.  To the user entering commands to the CCP this means a history
+; of the past several commands.
+;
+; Unfortunately there are a few fundamental incompatibilities between
+; bdos(10) and the WordStar class of editors.  There is a modified ZPM3
+; available which corrects these incompatibilities and this sample key
+; translation file assumes that the modified ZPM3 is in use.  ZPM3 is
+; just Simeon Cran's BDOS clone; it is not sacrosanct and there is no
+; reason to refrain from fixing it.
+;
+;-----------------------------------------------------------------------
+;
+; In the descriptions which follow, WS means WordStar or similar editor
+; and CCP refers to any program which uses bdos(10) for line input.
+; Of course the CCP itself is one such program.
+;
+;-----------------------------------------------------------------------
+
+; Arrow keys
+; ----------
+
+; Up arrow key is mapped to ^E (05 ENQ)
+; WS:	Move cursor up one line.
+; CCP:	Returns the previously entered line.  Each successive Up keypress
+;	steps one line further back in the history.
+Up = ^E
+
+; Down arrow is mapped to ^X (18 CAN)
+; WS:	Move cursor down one line unless at end of file
+: CCP:	Return the next line in the history unless already at the most
+;	recent line.
+Down = ^X
+
+; Left arrow is mapped to ^S (13 DC3)
+; WS:	Move cursor one character to the left.  If at the beginning of a
+;	line then wrap backwards to the end of the previous line.
+: CCP:	Move cursor one character left unless at the beginning of the line.
+Left = ^S
+
+; Right arrow is mapped to ^D (06 ACK)
+; WS:	Move cursor one character to the right.  If at the end of a line
+;	then wrap to the beginnng of the next.
+; CCP:	Move cursor one character to the right unless already at the end
+;	of the line.
+Right = ^D
+
+; Control + left arrow is mapped to ^A (01 SOH)
+; WS:	Move cursor one word to the left, wrapping to previous line if
+;	necessary.
+; CCP:	Move cursor one word to the left, stopping at the beginning of
+;	the line.
+Ctrl left = ^A
+
+; Control + right arrow is mapped to ^F (06 ACK)
+; WS:	Move cursor one word to the right, wrapping to next line if
+;	necessary.
+: CCP:	Move cursor one word to the right, stopping at end of line.
+Ctrl right = ^F
+
+; Alt + up arrow is mapped to ^W (17 ETB)
+; WS:	Scroll the screen up one line.  Cursor remains fixed with respect
+;	to the text unless it is at the bottom of the screen in which case
+;	it remains at the bottom of the screen, effectively moving up one
+;	line in the text.
+; CCP:	Delete everything to the right of the cursor.
+Alt Up = ^W
+
+; Alt + down arrow is mapped to ^Z (1A SUB)
+; WS:	Scroll the screen up one line.  Cursor remains fixed with respect
+;	to the text unless it is at the top of the screen in which case it
+;	remains at the top of the screen, effectively moving down one line
+;	in the text.
+Alt Down = ^Z
+
+: Dealing with the Home and End keys presented a bit of a challenge.  First
+: we must decide what we expect that the Home and End keys should do.
+:
+: The weight of experience suggests that in most contexts (not limited to
+: CP/M) the End key should move the cursor to the end of the current line
+: and that the Home key should move the cursor to the beginning of the line.
+: This is common behaviour in text editors (UNIX, Windows) and in command
+: editing (Windows, linux [gnome]).
+:
+; Recall that the objective here is to construct a set of key translations
+; which are useful in two primary CP/M contexts:
+;  1.	Text editors which follow the WordStar input model
+;  2.	Line-at-a-time input via BDOS function 10 such as used by application
+;	programs (such as the CCP)
+; The difficulties we face in this endeavour arise from the observation that
+; the control sequences needed to move the cursor to the end or beginning of
+; the current line in the BDOS(10) context are very different from those which
+; perform the same operation in the WordStar class of text editors.
+;
+;				bdos(10)		WordStar
+; Cursor to start of line	  ^B			  ^Q S
+; Cursor to end of line		  ^B			  ^Q D
+;
+; Presenting those sequenes in the wrong context may have nasty effects.  ^B
+; in WordStar reformats the current paragraph.  That is probably not what a
+; user would expect of Home or End.  Similarly, in a bdos(10) context, ^Q S
+; and ^Q D are unlikely to do anything that could be expected of Home or End.
+; ^Q would be ignored and the S or D would be inserted into the text.
+;
+; It gets even more complex because some shift keys don't work as expected
+; when chorded with Home, End, Insert and Delete.
+;
+; In the hope of at least partially resolving these issues, we do not trans-
+; late the unshifted Home and End keys at all because it is too easy to forget
+; the consequences and press Home or End in an inappropriate context.  It is
+; hoped that making the user choose the correct shift key will force him/her
+; to select the one which offers the desired effect.
+;	bdos(10)	Chord with Control
+;	editors		Chord with Alt
+; Using the shift key instead of control or alt is not an option but beyond
+; that there is no particular reason for choosing these pairings; it was an
+; arbitrary decision and anyone is free to change it.
+
+; Control Home
+; WS:	Reformat a couple of paragraphs, possibly making a mess.
+; CCP:	Move cursor to the beginning of the line.
+Control Home = ^B ^B
+
+; Control End
+; WS:	Reformat the current paragraph, a potentiall useful action so long
+;	as the user knows what he/she is doing.
+; CCP:	Move the cursor to the end of the input line.
+control end  = ^B
+
+; Interestingly, the effect of ^B in WordMaster, a precursor to WordStar, is
+; to move the cursor to the beginning of the line unless it is already there
+; in which case move it to the end.  Quite similar to the bdos(10) operation.
+
+; Alt Home
+; WS:	Move cursor to the beginning of the current line
+; CCP:	Inserts an S into the input line.
+alt home = ^Q S
+
+; Alt End
+; WS:	Move cursor to the end of the current line
+; CCP:	Inserts a D into the input line
+Alt End  = ^Q D
+
+: In one particular scenario, namely 64-bit cygwin, the untranslated byte
+: sequences generated by the Home and End keys are:
+:	home		<esc>[H
+:	end		<esc>[F
+:	alt home	<esc>[1;3H
+:	alt end		<esc>[1;3F
+:	control home	<esc>[1;5H
+:	control end	<esc>[1;5F
+
+
+; Page up is mapped to 12 DC2 ^R
+; WS:	Display the previous page of text.
+; CCP:	Ignore
+PgUp = DC2
+
+; Page down is mapped to ^C (03 ETX)
+; WS:	Display the next page of text.
+; CCP:	Do a warm boot if at start of line, otherwise do nothing.
+PgDn = ^C
+
+; Control PageUp and Control PageDown are set up for WordStar to move to
+; the beginning & the end of the document
+Ctl PageUp = ^Q ^R
+Ctl PageDown = ^Q ^C
+
+; Delete is mapped to ^G (07 BEL)
+; Works for bdos(10) calls and in WordStar-like applicatons to
+; delete the character at the cursor.
+Delete = bel
+
+; Control Delete is mapped to ^Y (19 EM)
+; WS:	Delete line. (Also WordMaster)
+; CCP:	Clear entire line
+ctl del = ^Y
+
+; Shift Insert is mapped to ^O (0F SI)
+; This is for WordMaster rather than WordStar and it toggles insert mode.
+; HOWEVER: Some xterm implementations deliver CR for Shift-Insert so
+; to cater for that we also map Alt-Insert to ^O even though that may
+; be hard to remember ...
+Shift Ins = ^O
+Alt Ins = ^O
+
+; Insert is mapped to ^V (16 SYN)
+; WS:	Toggle insert mode
+; CCP:	Clear line and delete from history
+Ins = ^V
+
+; The 5 key in the centre of the number pad is mapped to ^Q which
+; makes a convenient modifier for the surrounding keys when using
+; WordStar controls.
+NP5 = DC1
+
+; In many UNIX-like environments the backspace key generates DEL.
+; CP/M software normally expects a BS.  (Note, here DEL refers to
+; a character, not the Del/Delete key so I use the Unicode point
+; to refer to it.)
+;
+; Some advice:  Map keys by function, not by what is generated.  For
+; example, in this case the key is labelled Backspace and CP/M wants
+; a BS so we make the keypress deliver a BS.  To do that we translate
+; 7F to 08.
+U+7F = bs
+
+; There may be an occasion where some CP/M program really wants to see
+; a DEL character.  We've already made the Del(ete) key generate a ^G
+; which is what WordStar and BDOS(10) treat as meaning "delete the
+; character at the cursor" (a fine example of mapping keys by function)
+; so to satisfy this particular need we'll make Shift-Del generate DEL
+; and for uniformity with the Insert key treatment we'll do the same
+; with alt-del
+shift del = 7F
+alt del = 7F
+
+; Enable a fast interrupt when CP/M is locked, perhaps because it is
+; in a tight loop or memory is corrupt or a program accessed the BIOS
+; via the jump vector or for some other indeterminate reason.
+alt | = SysRq
+
+# ===================================================================
+# The things below are just some silly examples of what can be done
+# and are left over from testing the translate feature.  They do not
+# mean anything with respect to CP/M+.  If you use this file as the
+# basis for your yaze.ktt then you need to delete these.
+# ===================================================================
+
+# ---- PuTTY key test ----
+# control-left/right are mapped above so these just test control-up/down.
+ctrl up = "^Up"
+Ctrl down = "^Dn"
+
+Insert = "Ins"
+backtab = "Rev tab"
+
+u+20AC = "Euro"
+# These are the German accented characters from ybios.c where they
+# were being translated to [ \ ] { | } ~ respectively
+u+C4 = "A-um ["
+u+D6 = "O-um \"
+u+DC = "U-um ]"
+u+E4 = "a-um {"
+u+F6 = "o-um |"
+U+FC = "u-um }"
+U+DF = "ess-tzet ~"
+
+[ Since any special character at the beginning of a line means that
+[ the entire line is treated as a comment, how would one remap a key
+[ such as `?  Use the "lit" or "Literal" keyword which acts like a
+[ null modifier.
+
+literal ` = "grave accent"
+
+. Function key variants
+F12 = "F12"
+shift F12 = "Shift F12"
+alt F12 = "Alt F12"
+shift alt f12 = "Alt Shift F12"
+ctrl f12 = "Ctrl F12"
+ctrl alt F12 = "Ctrl Alt F12"
+
+. Alt-x where x is any single character
+alt / =  "String with " 22 "quote"  22 " marks"
+Alt k = "Alt-k"
+Alt K = "Alt-K"
+
+Alt equals = "Alt-="
+Alt + = "Alt-+"
+Alt _ = "Alt-_"
+
+# Recall the previous command, go to the beginning, position to just after
+# the first character and insert "Boo!"
+
+alt \ = ETB 02 EOT "Boo!"

@@ -1,0 +1,35 @@
+<html><head><title>LIB         </title></head><body><pre>
+  <a href="032.html">LIB</a>         
+
+
+  Syntax:
+
+          LIB filespec{[I|M|P|D]}
+          LIB filespec{[I|M|P]}=filespec{modifier}
+                                  {,filespec{modifier} ... }
+
+  Explanation:
+
+  A library is a file that contains a collection of object modules.
+  Use  the LIB utility to create libraries, and to append, replace,
+  select or delete modules from an existing library.   Use  LIB  to
+  obtain information about the contents of library files.
+
+  LIB creates and  maintains  library  files  that  contain  object
+  modules in Microsoft REL file format.  These modules are produced
+  by Digital Research's relocatable macro-assembler program,  RMAC,
+  or  any  other  language  translator  that  pruduces  modules  in
+  Microsoft REL file format.
+
+  You can use LINK-80 to link the object  modules  contained  in  a
+  library  to  other  object  files.  LINK-80 automatically selects
+  from the library only those modules needed by the  program  being
+  linked, and then forms an executable file with a filetype of COM.
+
+  
+ENTER .subtopic FOR INFORMATION ON THE FOLLOWING SUBTOPICS:
+
+<a href="033.html">OPTIONS</a>     <a href="034.html">MODIFIERS</a>   <a href="035.html">EXAMPLES</a>    
+
+
+<a href="./">HELP&gt;</a>  </pre></body></html>

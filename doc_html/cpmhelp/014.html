@@ -1,0 +1,50 @@
+<html><head><title>EXAMPLES    </title></head><body><pre>
+  <a href="009.html">DIR</a>         
+    <a href="012.html">WITHOPTIONS</a> 
+      <a href="014.html">EXAMPLES</a>    
+
+
+  A>DIR C: [FULL]
+
+       Displays full set of characteristics for all files in user 0
+       on drive C.
+
+  A>DIR C: [DATE]
+
+       Lists the files on drive C and their dates.
+
+  A>DIR D: [RW,SYS]
+
+       Displays all files in user 0 on  drive  D   with  Read-Write
+       and System attributes.
+
+  3A>DIR [USER=ALL, DRIVE=ALL]
+
+       Displays all the files in all user numbers (0-15) in all on-
+       line drives.
+
+  B6>DIR [exclude] *.DAT
+
+       Lists all the files on drive B in user 6 that do not have  a
+       filetype of .DAT.
+
+  3B>DIR [SIZE] *.PLI *.COM *.ASM
+
+       Displays all the files  of  type  PLI,  COM, and ASM in user
+       3 on drive B in size display format.
+
+  A>DIR [drive=all user=all] TESTFILE.BOB
+
+       DIR  displays  the  filename TESTFILE.BOB if it is found  on
+       any drive in any user number.
+
+  A>DIR [size,rw] D:
+
+       DIR lists  each  Read-Write file  that  resides on Drive  D,
+       with  its  size in kilobytes.  Note that D: is equivalent to
+       D:*.*.
+
+  
+
+
+<a href="./">HELP&gt;</a>  </pre></body></html>

@@ -1,0 +1,32 @@
+<html><head><title>EXAMPLES    </title></head><body><pre>
+  <a href="023.html">GENCOM</a>      
+    <a href="025.html">EXAMPLES</a>    
+
+
+  A>GENCOM MYPROG PROG1 PROG2
+
+       Generates a new COM file  MYPROG.COM   with  attached  RSX's
+       PROG1 and PROG2.
+
+  A>GENCOM PROG1 PROG2 [NULL]
+
+       Creates a COM file PROG1.COM  with  RSX's PROG1 and PROG2.
+
+  A>GENCOM MYPROG
+
+       GENCOM takes  MYPROG.COM,   strips   off  the   header   and
+       deletes all attached RSX's to restore it to its original COM
+       format.
+
+  A>GENCOM MYPROG PROG1 PROG2
+
+       GENCOM looks at the  already-GENCOMed file MYPROG.COM to see
+       if PROG1.RSX and PROG2.RSX are already attached RSX files in
+       the module.  If  either  one  is  already  attached,  GENCOM
+       replaces  it  with  the  new  RSX module.  Otherwise, GENCOM
+       appends the specified RSX files to the COM file.
+
+  
+
+
+<a href="./">HELP&gt;</a>  </pre></body></html>

@@ -1,0 +1,1293 @@
+<!doctype html public "-//w3c//dtd html 4.01 transitional//EN">
+<html>
+
+<head>
+<meta http-equiv="content-type" content="text/html;charset=iso-8859-1">
+
+<title>yaze-ag.doc</title>
+
+<style type="text/css">
+<!--
+body { margin-left:30px; margin-top:20px; margin-right:30px;
+	background-color:#FFFFC8; color:#000000 }
+li { margin-bottom:15 }
+
+a:link { font-weight:bold; color:#0000E0; text-decoration:none }
+a:visited { font-weight:bold; color:#000080; text-decoration:none }
+a:hover { font-weight:bold; color:#FF0000; text-decoration:none }
+a:active { font-weight:bold; color:#E00000; text-decoration:underline }
+a:focus { font-weight:bold; color:#00E000; text-decoration:underline }
+
+p	{ margin-bottom:15px }
+.no_b	{ margin-bottom: 0px }
+.no_bt	{ margin-bottom: 0px; margin-top: 0px }
+.no_t	{ margin-top: 0px }
+//-->
+</style>
+
+</head>
+
+<body>
+<pre>
+
+<b>YAZE-AG finale release 2.51.3
+
+This document describes <u>only</u> the new features from yaze-1.10 until yaze-ag-2.51.3.
+
+Look to the document <a href="yaze_doc.html">yaze.doc</a> for the other features (yaze-1.00).
+</b>
+<hr>
+My english is not so good, I hope you understand what I write here.
+---
+
+<b>CONTENTS:
+=========</b>
+
+ 0. <a href="#glossary">GLOSSARY</a>
+ 1. <a href="#features">FEATURES</a>
+ 2. <a href="#development">DEVELOPMENT</a>
+ 3. <a href="#fixed_bugs">FIXED BUGS</a>
+ 4. <a href="#bootsys">Some words to BOOTSYS (CP/M 3.1 loader)</a>
+ 5. <a href="#monitor_commands">New option and new monitor command</a>
+ 6. <a href="#CPM_disks">CP/M disks</a>
+ 7. <a href="#mounting_dir">Mounting directories with Time Stamps</a>
+ 8. <a href="#import_export">Import and Export utilities R.COM and W.COM</a>
+ 9. <a href="#serial_lines">Serial Lines</a>
+10. <a href="#keytranslation">Keytranslation (KTT-files)</a>
+11. <a href="#Coordinates_of_the_terminal_emulator">The coordinates of the terminal emulator (lines, columns) are now determined automatically over a window size handler <b>(<font color="#ff0000">New</font>)</b></a>
+12. <a href="#Wordstar_and_the_win_size_handler">Wordstar and the window size handler <b>(<font color="#ff0000">New</font>)</b></a>
+13. <a href="#MHz">The Z80-emulator inside YAZE-AG with e.g. 4000 kHz (4.0 MHz)<b> (<font color="#ff0000">New</font>)</b></a>
+14. <a href="#calcspeed">Calculation of the speed<b> (<font color="#ff0000">New</font>)</b></a>
+15. <a href="#zsm4">ZSM4 Macro Assembler for Z80/Z180/Z280<b> (<font color="#ff0000">New</font>)</b></a>
+16. <a href="#package">Following files are in the yaze-ag package (yaze-ag-2.41.8.tar.gz)</a>
+17. <a href="#optimizing">Optimizing and speedtest</a>
+18. <a href="#old_z80system">My old real Z80 System</a>
+
+<a name="glossary">&nbsp;</a>
+<b>0. GLOSSARY:
+===========</b>
+
+bios	Is the part of the bios which is witten in Z80 assembler. It acts as
+	a client to the yaze-bios. Here are central definitions (drive
+	tables, yaze control table (YCT), ...) which are essential for the
+	whole system.
+
+yaze-bios  Is the part of the bios which is written in C outsite of the z80
+           core and bios. It acts as a server to the bios.
+
+<a name="features">&nbsp;</a>
+<b>1. FEATURES:
+============</b>
+
+I took the idea of the page tables from Michael Hardt and built a simulated
+MMU.  The default definitions of the MMU are 16 tables with 16 page pointers
+(page size 4 KB) per table.
+
+You can run on yaze-ag-2.51.3 CP/M 2.2 or superdos (file: yaze.boot) with or
+without the MMU and 64 KB like the older version yaze-1.10 or you can run
+CP/M 3.1 or ZPM3 from Simeon Cran (file: yaze-cpm3.boot) always with the
+MMU and RAM up to 1MB.
+You can start CP/M 3.1 by simply executing the file CPM3.COM under CP/M 2.2
+or CP/M 3.1 (for example with a new bios version). The new CP/M 3.1
+loader BOOTSYS (see above) relocates and starts the appended CPM3.SYS and
+if CP/M 3.1 is running firstly all will be transferred from bank 1 (TPA)
+to bank 0 (SYS bank) with an interbank move (XMOVE/MOVE).
+
+The CP/M 3.1 bios (acts as a client to the yaze-bios) and the yaze-bios
+(ybios.c) uses the MMU intensive like a real Z80 CP/M 3.1 System
+(destination/source bank for read/write disk and interbank moves, multi-i/o
+is also implemented).
+
+Ten new options are described in the Makefile.
+
+Following features are implemented:
+
+	simz80.c	The Z80 interpreter. I made some optimizations and
+			made the necessary changes to embed the MMU.
+			(See above the file simz80.c, the option -DMMU and
+			 above "Optimizing".)
+
+	simz80_wts.c	The same as simz80.c, but "with t-states" of each Z80
+			intruction and the software extension to run the Z80
+			interpreter at a interaktive defined clock rate (see
+			"clock" command in the monitor).
+			This software extension is independent of the clock
+			rate of the host processor! It uses the real time clock
+			(RTC) of the Unix/Linux/Windows system.
+
+	MMU		with 16 tables to 16 page pointers (page size 4 KB).
+			A bank switch over the bios is simple done with a
+			pointer and so very fast (see *mmu in the new module
+			mem_mmu.[hc]).
+			I made a lot of changes in all modules to embed
+			the MMU in the whole system.
+			You can run CP/M 3.1 (bootfile: yaze-cpm3.boot)
+			or CP/M 2.2 (bootfile: yaze.boot) on yaze-ag-2.51.3.
+			You can start CP/M 3.1 by simply executing CPM3.COM
+			(bootsys.com+cpm3.sys).
+			(yaze-cpm3.boot is identically with a:cpm3.com)
+
+	BOOTSYS		Bootsys is a new CPM3.SYS loader. It was necessary
+			because the CPM3.SYS grows over 32K and the CPMLDR
+			or ZPM3LDR does not load this big file.
+			(See above "Some words to BOOTSYS".)
+
+	CP/M 3.1	All fundamental and essential functions are made for
+			running CP/M 3.1 .
+
+     The following features are not necessary but CP/M 3.1 supports it:
+
+	DATE		implemented
+
+	XMOVE/MOVE	implemented - this supports sector size > 128 Bytes
+			(Default sector size is now 2048 bytes.)
+
+	MULTIO		multi-i/o is also implemented and runs very well.
+
+	Mounting Directories
+			special feature to import directories into the
+			emulator by connecting them to CP/M drives. By that
+			way you can easily import files into the emulator.
+
+			The new feature since version 2.12 is that the update
+			time stamps are imported into the simulated CP/M
+			directory.
+			Look to chapter 
+			7. <a href="#mounting_dir">Mounting directories with Time Stamps</a>
+			in this document.
+
+	Import/Export utilities
+			Since version 2.30 you can import files with the
+			utility R.COM without exiting the emulator.
+			Also with W.COM you can export files to the host
+			system without exiting the emulator. Look to
+			chapter 8. <a href="#import_export">Import and Export utilities</a>
+
+	serial lines	since version 2.20 you can use the serial lines of
+			your computer. Look to chapter 9. <a
+			href="#serial_lines">Serial Lines</a>.
+		
+Following features are NOT implemented
+
+	char devices	not implemented - You can attach e.g. serial lines
+			to the AUX: device in the monitor of yaze-ag.
+
+<a name="development">&nbsp;</a>
+<b>2. DEVELOPMENT:
+================</b>
+
+I developed under Solaris 8 (sparcv9) and Linux (kernel 2.4.x/2.6.x) and used
+gcc version 3.x.x also under Solaris. I tested yaze-ag-2.20 on
+FreeBSD and DEC-Unix (alpha processor) - it works also there.
+
+I tried to use the SPARC-C-Compiler (cc) under Solaris. Everything will be
+compiled but yaze-ag does not run. I don't know why and so I use the gcc also
+for SPARC machines.
+
+I had a lot of fun in developing the bios and the yaze-bios for CP/M 3.1,
+but sometimes I was stunned - but I found the errors :-) .
+(see above section "My old real Z80 system")
+
+The known bug of version 2.01 is solved. I add the more feature to import
+the modification time of the unix files as update time under CP/M.
+Look Chapter 7 "<a href="#mounting_dir">Mounting directories with Time Stamps</a>" in this document.
+
+Since the pre release 2.00 you can use the "cdm" utility (CP/M Disk Manager)
+also under Linux.
+
+I have finished with this development cycle. Look to Chapter "<a href="#fixed_bugs">FIXED BUGS</a>"
+and chapter "<a href="#serial_lines">Serial Lines</a>".
+
+Today 16. February 2022 there are no known bugs in version 2.51.3.
+
+16. February 2022
+Andreas Gerlich
+(University of Ulm, Germany)
+
+<font size="+1">only text emails please: <img
+src="e_mail_yaze-ag.png" align="middle"> (email of the project)</font>
+
+<a name="fixed_bugs">&nbsp;</a>
+<b>3. Fixed BUGS:
+==============</b>
+
+Timothy Wagner and Carl Mascott reports a complex bug in yaze-ag-2.00.
+I found this error also when I work with the emulator (and with drives
+which are connected to a unix directory) and so I test also the old
+version yaze-1.10. This bug is also in yaze-1.10! I take the code to
+access unix directories from yaze-1.10 (see old version on the web page).
+
+
+Bug report 1:
+When you use the feature to connect a directory to a CP/M drive (A: - P:)
+this works if you use it to copy files from a directory to a disk-file under
+yaze-ag.
+But if you use it to import files from a Directory to compile sources
+and run programms while you edit source files with vi under Unix/Linux
+the emulator crashes after some time when you often access files on the
+drive which are connected to a directory.
+
+<b><font color="#008000">THIS BUG IS FIXED IN VERSION 2.01 !!!</font></b>
+
+
+Bug report 2:
+When you have two unix files like "Source.z80" and "source.z80" this are
+two different files under unix. CP/M does not handle upper and lower case
+of file names. All file names are holded upper case in the CP/M directories.
+When a unix directory was mounted and there was files like the two z80 files
+yaze-1.10 and yaze-ag-2.00 creates two CP/M directory entries with the name
+"SOURCE.Z80". This was a problem and the emulator crashes.
+
+<b><font color="#008000">THIS BUG IS FIXED IN VERSION 2.01 !!!</font></b>
+
+
+Bug report 3:
+When you use also the feature to mount unix directories to a CP/M drive,
+the problem is that if you edit a file with vi or nedit under unix the
+emulator don't know about this changes or new files until you make a "remount".
+
+<b><font color="#008000">THIS REREAD BUG IS FIXED IN VERSION 2.10 !!!</font></b>
+
+<b>Have a look to chapter 7 "<a href="#mounting_dir">Mounting directories with Time Stamps</a>".</b>
+
+
+Bug 4 which I found:
+When you use also the feature to mount unix directories to a CP/M drive,
+the problem was that when the filesize of a file was multiple of exactly
+16K (16k,32K...) the last 16k can not read. If a file was exactly 16k you
+only get the first 128 Byte when you make a "type" on a source file for
+example. It was a chance to find this bug, The bug was in the simulated
+directory for CP/M when you connect a Unix directory to a CP/M drive.
+
+<b><font color="#008000">THIS SIMULATION DIRECTORY BUG IS FIXED IN VERSION 2.20.1 !!!</font></b>
+
+<b>Its recommended to update the executable to this version 2.20.1 !!!</b>
+
+
+In yaze-ag-2.51.3 there are no known bugs! I mean there are no further
+errors but if you find one feel free and send an email to me. If you miss
+a feature feel free and send an email to me, too.
+
+16. February 2022
+Andreas Gerlich
+(University of Ulm, Germany)
+
+<font size="+1">only text emails please: <img
+src="e_mail_yaze-ag.png" align="middle"> (email of the project)</font>
+
+<a name="bootsys">&nbsp;</a>
+<b>===========================================
+4. Some words to BOOTSYS (CP/M 3.1 loader):
+===========================================</b>
+
+The BIOS3 under Z80 (acts as an client to the yaze-bios (ybios.c) with the
+files BIOSKRNL.Z80, YDRVTBL.Z80, MMU.Z80, YCT.Z80 and SCB.Z80, linked with
+BNKBDOS3.SPR and RESBDOS3.SPR to CPM3.SYS by GENCPM.COM (see drive P:))
+supports all 16 drives from A: to P: .
+All tables for these drives (defined in YDRVTBL) are very big - CPM3.SYS
+is 43KB! All tables are defined to handle disks up to 64 MB. Greater disks
+will not work, but it is possible to create them in the monitor in yaze-ag (and
+cdm) and then you have to change the definitions in YDRVTBL.Z80/SYSDEF.LIB.
+
+When CPM3.SYS gets over 34KB, CPMLDR (ZPM3LDR cannot run with my loader
+bios ?!?!) cannot load this big file (I don't know why and I don't want to
+debug it). So I had to look for another way to load CPM3.SYS. I search for
+informations of the file structure of CPM3.SYS. So I developed BOOTSYS.Z80.
+It relocates the resident and banked part (if present) held in the joined
+CPM3.SYS and jumps into the bios to start CP/M 3.1.
+
+| BOOTSYS works very well. BOOTSYS.Z80 is written, so that BOOTSYS runs also
+| on a real CP/M System. If the cp/m vectors are present BOOTSYS prints the
+| messages over the bios (conout), if not, it uses the yaze-bios directly
+| over the HALT instruction. BOOTSYS should be run always under a real
+| Z80 CP/M 2.2 system to start CP/M 3.1 (I use Z80 instructions).
+
+If CP/M 3.1 is always running BOOTSYS try to move BOOTSYS+CPM3.SYS from
+bank 1 to bank 0 switch to bank 0 and relocates and start CP/M 3.1.
+Under YAZE-AG-2.30.2 BOOTSYS is in the position to start always CP/M 3.1
+under CP/M 3.1! WHY?
+In YAZE-AG-2.51.3 the XMOVE and MOVE routines are definded outside the Z80
+memory in C and the short routines to call the yaze-bios are in the resident
+part of the bios, so all works well under YAZE-AG-2.51.3.
+If in a real Z80 CP/M 3.1 system the XMOVE/MOVE routines are placed in the
+banked part of a bios (possible if a DMA make the interbank transfere) then
+it can be that this parts will be overwritten when bootsys+cpm3.sys are
+transfered from bank 1 to bank 0. In this case you can not make a new start
+of CP/M 3.1 under CP/M 3.1. You must run CPM3.COM from CP/M 2.2 (You generate
+CPM3.COM by "PIP CPM3.COM=BOOTSYS.COM,CPM3.SYS").
+
+How BOOTSYS works and what conditions are necessary to run under CP/M 3.1
+is described in README_BOOTSYS.
+
+BOOTSYS+CPM3.SYS is also in the file yaze-cpm3.boot which is loaded instead
+of yaze.boot if the C-compiler option -DBOOTSYS is defined in the Makefile.
+It is the same file like CPM3.COM on drive A: . I transfer it to Unix/Linux
+and rename it yaze-cpm3.boot.
+
+<a name="monitor_commands">&nbsp;</a>
+<b>5. New option and new monitor commands
+======================================</b>
+
+You can call yaze-ag with the option '<b>-1</b>'. This option force sector size
+128 bytes. Normally sector size is 2048 bytes under CP/M 3.1. Under
+CP/M 2.2 yaze-ag uses always sector size 128 bytes.
+
+If you go with the sys.com utility into the monitor you can give the new
+command '<b>128</b>'. This forces sector size 128 byte, too.
+
+This option was necessary because some disk edited utilities (like B:DED.COM)
+does not work with sektor size 2048.
+
+The command '<b>setaccess on/off</b>' switch on/off the access time for mounted
+directories connected to a CP/M drive. The update time is always on.
+Create time stamps are not supported by the host systems.
+
+I expand the mount command. If you give "<b>mount -v</b>" you will get very detail
+informations about the connected drives/directories if you have started
+CP/M 3.1.
+
+<a name="CPM_disks">&nbsp;</a>
+<b>6. CP/M disks
+=============</b>
+
+I describe here only the changes in the disk header of a &lt;CPM_Disk&gt; (.ydsk files).
+Look for details to chapter 6. "<a href="yaze_doc.html#cpmdisks">CP/M disks</a>" in <a href="yaze_doc.html">yaze.doc</a>.
+
+The new disk header occupies the first 128 BYTES of the file and has the
+new format:
+
+          0 -   9    &lt;CPM_Disk&gt;
+         10 -  15    a null-terminated ascii comment (may be empty)
+     new 16          version (0 = yaze-1.06/1.10, 1 = yaze-ag-2.xx)
+         17 -  31    a null-terminated ascii comment (may be empty)
+         32 -  33    sectors per track
+         34          block shift factor
+         35          block mask
+         36          extent mask
+         37 -  38    disk size max
+         39 -  40    directory max
+         41          al0
+         42          al1
+         43 -  44    check size (always zero)
+         45 -  46    track offset
+     new 47          psh (used if version=1 and CP/M 3.1 is running)
+     new 48          phm ( "   "    "   "    "   "   "   "    "    )
+         49 - 127    unused (zeros)
+
+If version is 0 the sektor size is set to 128 bytes (psh=0, phm=0) in the DPB
+of the corresponding drive. Psh and phm are only used under CP/M 3.1 if
+version is 1.
+
+You can alway transfere disk files between an old version of yaze (1.06/1.10)
+and yaze-ag-2.51.3. The new disks looks under yaze-1.10 like a disk with sektor
+size 128 bytes. The new fields are ignored. You can also use your old disk
+files of yaze-1.10/1.06 under yaze-ag-2.51.3. The field "version" is in disk
+files from yaze-1.10/1.06 always 0.
+
+The fields version, psh and phm are used only in yaze-ag-2.xx and if CP/M 3.1
+is running. The default sektor size is 2048 bytes (psh=4, phm=15).
+
+I change also the default value of sektors per track to 128. (The old value
+was 26).
+
+You can set 128 byte sektors (psh=0, phm=0) for all disk with the flag "-1"
+or the new monitor command "128".
+This was necessary because some disk edited utlilities (like DED.COM)
+does not work with sektor size 2048 bytes.
+
+<a name="mounting_dir">&nbsp;</a>
+<b>7. Mounting directories with Time Stamps
+========================================</b>
+
+This chapter describes the special feature to import directories into the
+emulator by connecting them to CP/M drives. That way you can easily import
+files into the emulator.
+
+(An another way to import files is to use the cdm utility (CP/M disk manager).
+ Only with cdm you can also export files (see man page cdm.1 or <a href="cdm.1.html">cdm(1)</a>). )
+
+But you can also use the feature "Mounting Directories" to compile/assemble
+source files which you import over a drive which is connected to a directory.
+That way you can edit files with vi or an another editor under unix and
+compile it inside yaze-ag. You can use the make.com utility which is on A:
+(disk file: BOOT_UTILS) because the update time stamps are imported from
+the host system and are present in the simulated CP/M directory!
+(Look above the submit file examples in this chapter!)
+
+But you have to take notice of some things:
+
+1. The mounted directory is always read only.
+2. You have to syncronise the simulated directory inside yaze-ag / CP/M and the
+   directory of the host which is connected to a CP/M drive.
+
+The second point means: If you change a file with an editor under Unix the
+CP/M inside yaze-ag don't knows about these changes --> you must sync the
+simulated directory under CP/M with the connected unix directory.
+At that moment CP/M knows about changed and new files in the unix directory.
+
+To sync (reread) the mounted directories you have four ways to do this:
+
+a) CTRL-C at the command prompt (CCP).
+b) to use the utility "resetdsk.com" (see A: disk file BOOT_UTILS).
+c) to use the monitor command "sys remount &lt;drive&gt;"
+d) to use the monitor command "sys mount &lt;drive&gt; &lt;directory-path&gt;"
+
+'a' is for online use.
+'b', 'c' and 'd' is for use in a submit file.
+
+<b><u>To a) (CTRL-C):</u></b>
+
+ the left side is for CP/M          the right side is the host on which yaze-ag
+ inside yaze-ag			    runs (for example an unix host)
+ (C: is connected to ./disksort/)
+
+I make in CP/M:
+
+A>C:
+C>3dir disksort.c
+
+  NAME                UPDATE
+----------  ...  ----------------
+DISKSORT.C       14/04/2004 10:20
+
+<b>notice:</b> the time is 10:20
+
+				then I make under unix:
+
+					$ pwd
+					.../disksort
+					$ date
+					Wed Apr 14 17:44:01 MEST 2004
+					$ touch disksort.c
+
+					  <b>notice:</b> with touch I set the
+					  	  time to 17:44:xx
+
+then I make in CP/M:
+
+C>3dir disksort.c
+
+  NAME                UPDATE
+----------  ...  ----------------
+DISKSORT.C       14/04/2004 10:20
+
+ <b>notice:</b> the time is still 10:20
+
+C>
+C>
+C><b>^C   (<--- give CTRL-C !!!)</b>
+C>        (this makes a reread of ./disksort/)
+C>
+C>
+C>3dir disksort.c
+
+  NAME                UPDATE
+----------  ...  ----------------
+DISKSORT.C       14/04/2004 17:44
+			    <b>^^^^^
+notice:			      |</b>
+The time of disksort.c is now <b>/</b>
+ 
+Technical Background: 
+When you give a CTRL-C at the Command prompt CP/M resets the whole disk system.
+At the next bios call of seldsk (select disk) CP/M say in a flag "first 
+access to this drive". Any further calls of seldsk to the same drive have not
+set this flag. I use this flag to make a reread of the unix directory.
+
+If you want to show also the access time stamps of a mounted directory
+see the monitor command "setacces on/off" in the chapter 5
+"<a href="#monitor_commands">New option and new monitor commands</a>".
+(I can not set "access time stamps" in the LabelByte of the disk label
+ because CP/M tries to update the access time when you access a file in the
+ (unix) directory (directories are always read only). DIR.COM shows the
+ access time but say it is the creation time. 3DIR.COM of the ZINC project
+ (drive F:) say correctly access time.)
+
+When you force a reread of a mounted directory also the changed size of each
+file is updated.
+
+<u>                                                                         </u>
+
+The following submit file examples are on drive D: which is connected to
+the disk file disksort.ydsk. It contains the DISKSORT project. These disk
+file is formated with INITDIR.COM (see "HELP INITDIR") and in the
+label "DISKSORT" the update time stamps are set (see "HELP SET LABEL" and
+"HELP SET TIME-STAMPS").
+The source files are in the (unix-)subdirectory ./disksort/ which is
+connected to the CP/M drive C:
+
+<b><u>To b):</u></b>
+
+To use the "resetdsk.com" utility is like CTRL-C. It resets the disk system
+over the BDOS call no 37 .
+
+You can use "resetdsk.com" in the following example:
+
+	D.sub:
+	
+	;
+	resetdsk
+	;
+	; this resets the whole disk system (all disks).
+	;
+	;
+	; Now compile the source
+	;
+	make -f disksort.mak $1
+	;
+	; This makefile makes a time comparison between the source files
+	; on drive C: (connected to unix directory ./disksort, read-only)
+	; and the compiled rel-files on drive D: (connected to the disk file
+	; "DISKSORT.dsk", read-write).
+	; Drive D: (the target) must initialized with INIRDIR.COM
+	; (see "HELP INITDIR") and you must create a label and update time with
+	; "SET [NAME=&lt;LABEL-NAME&gt;,UPDATE=ON] (see "HELP SET").
+	;
+
+NOTICE: The example D.Sub is on D: and you have to call this submit file from
+	D: (Look to the rules in the make file disksort.mak).
+
+
+
+<b><u>To c):</u></b>
+
+To use the monitor command "sys remount &lt;drive&gt;" is the same as resetdsk.com.
+It's only an another way.
+
+	DD.sub:
+	
+	;
+	sys remount c
+	;
+	; this resets drive C: (it must be connected to a directory). 
+	;
+	;
+	; Now compile the source
+	;
+	make -f disksort.mak $1
+	;
+	; This makefile makes a time comparison between the source files
+	; on drive C: (connected to unix directory ./disksort, read-only)
+	; and the compiled rel-files on drive D: (connected to the disk file
+	; "DISKSORT.dsk", read-write).
+	; Drive D: (the target) must initialized with INIRDIR.COM
+	; (see "HELP INITDIR") and you must create a label and update time with
+	; "SET [NAME=&lt;LABEL-NAME&gt;,UPDATE=ON] (see "HELP SET").
+	;
+
+NOTICE: The example DD.Sub is on D: and you have to call this submit file
+	from D:
+
+
+<b><u>To d):</u></b>
+
+To use the monitor command "sys mount &lt;drive&gt; &lt;directory-path&gt;" is not the
+same as the last examples:
+
+	DDD.sub:
+	
+	;
+	sys mount c ./disksort/
+	;
+	; this (re)mounts the directory ./disksort to CP/M drive C:
+	; (this is like a remount)
+	;
+	;
+	; Now compile the source
+	;
+	make -f disksort.mak $1
+	;
+	; This makefile makes a time comparison between the source files
+	; on drive C: (connected to unix directory ./disksort, read-only)
+	; and the compiled rel-files on drive D: (connected to the disk file
+	; "DISKSORT.dsk", read-write).
+	; Drive D: (the target) must initialized with INIRDIR.COM
+	; (see "HELP INITDIR") and you must create a label and update time with
+	; "SET [NAME=&lt;LABEL-NAME&gt;,UPDATE=ON] (see "HELP SET").
+	;
+
+NOTICE: DDD.Sub is on D: and you have to call this submit file from D:
+
+The difference between this submit file and the previous submit files is
+that you can have different submit files on different drives. 
+Each submit file uses an another directory path for drive C: and so you can
+compile different projects on different disk files.
+
+"sys mount &lt;drive&gt; &lt;directory-path&gt;" (re)mounts a directory.
+The mount command (of the monitor) makes internally first an unmount of the
+&lt;drive&gt; and then reads the whole directory which is give as the second
+parameter &lt;directory-path&gt;.
+CP/M in Yaze-ag knows at this moment about new and changed files in the
+unix directory &lt;directory-path&gt;.
+
+20. November 2013
+Andreas Gerlich
+(University of Ulm, Germany)
+
+<font size="+1">only text emails please: <img
+src="e_mail_yaze-ag.png" align="middle"> (email of the project)</font>
+
+
+<a name="import_export">&nbsp;</a>
+<b>8. Import and Export utilities R.COM and W.COM:
+===============================================</b>
+
+Since version 2.30 there exists two utilities for import and export
+files from and to the host system.
+
+With the R.COM utility you can import files from the host system
+into the emulator without exiting the emulator!
+When you call R.COM without a parameter it tells you how you use it:
+
+	A>r
+
+	READ V-2.23-3.01 (20-Jan-2017) YAZE-AG V2.51
+	Usage: R &lt;file name&gt; [U]
+	Binary copy &lt;file name&gt; from host environment. U = use upper case for name.
+
+	Examples
+	R bdos.mac        copy bdos.mac to BDOS.MAC
+	R bdos.mac U      copy BDOS.MAC to BDOS.MAC
+	R *.mac           copy all files ending with .mac
+	R a:bdos.mac      copy bdos.mac to A:BDOS.MAC
+	R a:*.com         copy all .COM files to A:
+	R src/bdos.mac    copy src/bdos.mac to BDOS.MAC
+	R src/a:bdos.mac  copy src/bdos.mac to BDOS.MAC on A:
+	R src/*.mac       copy all .mac files from directory SRC
+	R src/*.MAC U     copy all .MAC files from directory src
+	R src/a:test.*    copy all test.* files from directory src to A:
+
+	A>
+
+With the W.COM utility you can export files to the host system
+from the emulator without exiting the emulator!
+When you call W.COM without a parameter it tells you how you use it:
+
+	A>w
+
+	WRITE V-1.17-3.10 (28-Apr-2020)  YAZE-AG V2.51
+	Usage: W &lt;file name&gt; [B|T]
+	Copy &lt;file name&gt; to host environment. Default is text, B for binary, T for Text
+
+	Examples
+	w bdos.mac        copy BDOS.MAC as text file "bdos.mac"
+	w pip.com b       copy PIP.COM as binary file
+	w pip.com         copy PIP.COM as binary file [.COM .REL .DAT .ARC imply B]
+	w test.dat t      copy TEST.DAT as text file
+	w *.com           copy all files matching *.COM as binary files
+	w src/bdos.mac    copy BDOS.MAC to "./src/bdos.mac" as a text file
+	w june/*.com b    copy *.COM to directory "./june" as binary files
+	w source/*.spl t  copy *.SPL to directory "./source" as text files
+
+	Files with the same name on the host will be overwritten without any query!
+
+	A>
+
+The utilities are written in SPL (Simple Program Language) and compiled
+with the SPL environment which is on drive L: (spl.ydsk).
+The submit file Y.SUB compiles YWRITE.SPL and link it to A:W.COM.
+The submit file Z.SUB compiles YREAD.SPL and link it to A:R.COM.
+
+<font size="+1">only text emails please: <img
+src="e_mail_yaze-ag.png" align="middle"> (email of the project)</font>
+
+
+<a name="serial_lines">&nbsp;</a>
+<b>9. Serial Lines:
+================</b>
+
+With the "attach"-command in the monitor you can handle the serial lines:
+(You call the monitor with "sys.com" and no parameter.)
+
+	For Solaris on SUN-Machines the device is
+		/dev/ttya	for the first serial port
+		/dev/ttyb	for the second serial port
+
+	For Linux (PC) the device is
+		/dev/ttyS0	for COM1
+		/dev/ttyS1	for COM2
+		...
+
+	For Cygwin the device is
+		/dev/ttyS0 or /dev/com1	for COM1
+		/dev/ttyS1 or /dev/com2 for COM2
+		...
+
+	How the devices is called in MAC OS X I dont't
+	know.
+
+You can write the attach command into the .yazerc file (edit it
+with vi in Unix/Linux or with the metapad.exe in Windows).
+Then you have always the serial line connected.
+The command you must write is:
+
+	attach aux /dev/ttyS0	(for example)
+
+This connects the aux-device of CP/M 3 with the device in
+Unix/Linux/Windows. 
+
+Then you have to make a Nullmodem cable to connect the two computers.
+(You must see in your technical documentation of your computer.
+I have cables which uses on the PC side the 9-pole connector and on
+the side of the Z280-Computer also a 9-pole connector, but with an
+another pin content)
+
+On the disk-file "Kermit_SZRZ.ydsk" are the programms kermit.com, sz.com
+and rz.com (ZModem). With them you can connect to the other computer and
+transfere data.
+
+Baud rate:	You use the "DEVICE.COM" programm under CP/M 3 to set
+		the baud rate. On my Z280 Computer (CPU280 by Reh Designe)
+		I can set the baud rate in the Setup-routine of the
+		boot loader.
+
+		In Unix/Linux you use the "stty" programm.(look "man stty")
+		Kermit (called ckermit) is available for Unix/Linux.
+		With the kermit.com inside YAZE-AG when yaze_bin runs
+		you can also communicate with a real CP/M computer.
+
+		Under Windows you can use the Hyperterminal to initialize
+		the COM-Port. I have an Icon with the Baud rate 19200
+		on my desktop, which calls the hypterterminal and initialice
+		the COM-Port to 19200 Baud. By the way Hyperterm understand
+		also the kermit-protocol. So you can exchange Data between
+		a real CP/M Computer and a Windows computer.
+		With the kermit.com inside YAZE-AG when yaze_bin.exe runs
+		you can also communicate with a real CP/M computer.
+
+	I tried higher transfer rates than 19200, but only 19200 or
+	less works with a CP/M-computer !!!
+
+	When you connect two PC-Computers with the serial chip which have
+	a FIFO for 10 characters, you can go up to a baud rate of 110000.
+
+
+For example I have the following situation to develop for my Z280-System
+(called CPU280 by Reh Design (Tilmann Reh)):
+
+
+				   Notebook (Windows 7)
+	Z280 - System		.-----------------------.
+	  (CP/M 3)	    COM1|     .------------.	|
+			+-------=-----| HYPER-Term |	|
+	  Monitor	|serial	|     `------------'	|
+	     |		|line	|			|
+	.---------.	|	|     .-----------.	|
+	|	  |CRT1 |	|     | notepad++ |-----=--------+
+	|CPU-UART-=-----+	|     |  Editor   |	|	 |
+	|  (Z280) |		|     `-----------'	| eth0	 |
+	|CP/M-AUX-=-----+	|     .-------.		|	 |
+	|	  |CRT2	|	|     | PUTTY |---------=-------+|
+	`---------'	|	|     `-------'		|	||
+	     |		|	`-----------------------'	||
+	  keyboard	|					||
+			|					|| LAN
+			|    	  Server (64 Bit Linux)		||
+			|	.-----------------------.	||
+			|	|			|	||
+			|	|	+---------------=-------+|
+			|	|	|      .------.	| eth0	 |
+			|	|	|      |Samba |-=--------+
+		 serial |	|	|      `------'	|
+		 line	|       | .-------------.  |	|
+			|   COM1| |     YAZE-AG |  |	|
+			+-------=-|AUX  (CP/M 3)|  |	|
+				| `-------------'  |	|
+				|	|     .------.	|
+				|	+-----|  HD  |	|
+				|	      `------'	|
+				`-----------------------'
+
+- I'am sitting at my Notebook. With notepad++ I edit C-sources which I
+  put over CIFS/SMB with Samba on the Hard disk(HD) of the Linux-Server.
+
+- With the function "<a href="#mounting_dir">Mounting directories with Time Stamps</a>" (described
+  also in this document) I import the edit files into YAZE-AG. I have
+  a connection over the SSH-Client PUTTY to a running YAZE-AG on the
+  Linux-Server. So I can compile the C-sources with a make utility with
+  the HI-C-Z280-Compiler inside YAZE-AG from my Notebook.
+  (The HI-C-Compiler is very slow, but on the Linux-Server with a
+   CPU clock of 2.66 GHz it is a little bit faster <img src="happy.gif"
+   align="bottom"> )
+
+- The AUX device of the CP/M inside YAZE-AG is attached to /dev/ttyS0 (COM1)
+  of the Linux-System.
+
+- At the Keyboard/Monitor of the Z280 system I start kermit (it uses AUX of
+  CP/M 3 which is connected to the serial Port CRT2).
+  I also start kermit inside YAZE-AG on the Linux-Server to transfere the
+  compiled programm data from YAZE-AG on the Server to the Z280 system.
+
+- The software which I write for the Z280 uses the UART which is inside the
+  Z280 CPU. I see the output at the UART of the Z280-programm in the
+  Hyperterminal at my Notebook and so I can control the software in the
+  Z280 system.
+
+20. November 2013
+Andreas Gerlich
+(University of Ulm,Germany)
+
+<font size="+1">only text emails please: <img
+src="e_mail_yaze-ag.png" align="middle"> (email of the project)</font>
+
+
+<a name="Keytranslation">&nbsp;</a>
+<b>10. Keytranslation:
+===================</b>
+
+The keytranslation module was written by Jon Saxton.
+It let you use the cursor keys of the PC in the command line of
+CP/M 3.1 and in Wordstar or other wordstar compatible editors.
+Also you can put "strings" on function-key and many more.
+
+Look to the PDF "yaze-keys.pdf" to see how the keytranslation works and
+how you use it.
+
+By default the keytranslation-table "yaze.ktt" is loaded by yaze-ag.
+There are 3 KTT-files: yaze.ktt, m2.ktt and sample.ktt.
+m2.ktt is for the editor in the Turbo-Modula-2.
+sample.ktt are samples.
+
+With the A:KTT.COM inside the emulator you can change the ktt-file.
+The ktt-files are in the host system Unix/Linux or Windows, NOT inside
+the emulator!
+
+2. January 2018
+Andreas Gerlich
+(University of Ulm, Germany)
+
+<font size="+1">only text emails please: <img
+src="e_mail_yaze-ag.png" align="middle"> (email of the project)</font>
+
+
+<a name="Coordinates_of_the_terminal_emulator">&nbsp;</a>
+<b>11. The coordinates of the terminal emulator (lines, columns) are now determined automatically over a window size handler
+=========================================================================================================================</b>
+
+The yaze-ag binary (yaze_bin) determines over a window size handler (Unix/Linux
+signal routine) the coordinates of the used Terminal emulator (xterm, gnome-
+terminal, mintty(Cygwin/Windows), ...). These coordinates are putting into the
+lines and columns variables of the SCB (System Control Block) of CP/M 3.1.
+
+The system programs of CP/M 3.1 (like TYPE.COM, DIR.COM, ...) and also the
+patched Wordstar (see the next chapter and drive A:) retrieves then these
+coordinates from the SCB over the standardized BDOS-interface (call to 0005H)
+of CP/M 3.1.
+
+The window size handler will be activated when you change the coordinates of
+the terminal emulator and updates the lines and columns in the SCB.
+Then a message is generate with the current lines and columns.
+
+
+<a name="Wordstar_and_the_win_size_handler">&nbsp;</a>
+<b>12. Wordstar and the window size handler
+========================================</b>
+
+Jon Saxton produced a patch (see A:CPM4WS4.Z80) for Wordstar 4.0 to set the
+lines and columns in Wordstar from the SCB (System Control Block) of CP/M 3.1.
+So you can use a terminal emulator (like mintty.exe (Cygwin/Windows), or
+gnome-terminal (LinuxMint), or lxterminal (Raspbian), or ...) with lines and
+columns as you wish.
+
+The lines and columns are retriving from the SCB one time before wordstar
+initializes the screen. After that initialisation the lines and columns are not
+retrieving once more while Wordstar is running.
+That means: When you change the coordinates of the terminal emulator while
+Wordstar is running, Wordstar does not known about these changes until you
+restart Wordstar again. That means: You have to define the coordinates of
+the terminal emulator bevor you start Wordstar!
+
+If you want to change the coordinates of your terminal emulator while Wordstar
+is running you must firstly finish wordstar and go back to the command line of
+CP/M 3.1. Then change the coordinates of your terminal emulator and then start
+Wordstar again.
+
+30. April 2020
+Andreas Gerlich
+(University of Ulm, Germany)
+
+<font size="+1">only text emails please: <img
+src="e_mail_yaze-ag.png" align="bottom"> (email of the project)</font>
+
+
+<a name="MHz">&nbsp;</a>
+<b>13. The Z80-emulator inside YAZE-AG with for example 4000 kHz (4.0 MHz)
+=======================================================================</b>
+
+I have produced a brake in software for the z80-emulator inside yaze-ag. You
+can define for example "4000" for 4000 kHz (4.0 MHz) to run the Z80-emulator
+at 4 Mhz.
+
+I have defined the new command "clock" in the monitor, so you can interactivly 
+define the clockrate at that frequency the Z80-emulator then runs.
+
+Here some examples:
+-------------------------------------------------------------------------------
+A&gt;sys help clock
+
+clock                      without argument lists the current frequency.
+                           The frequency is shown in kHz and MHz.
+                           If the frequency is 0 the emulator runs with
+                           "max speed" as possible.
+
+clock &lt;frequency in kHz&gt;   Set a frequency. The frequency must be in kHz.
+                           For example for 4 MHz place 4000.
+                           A "0" resets the emulator to max speed.
+
+
+A&gt;sys clock
+
+Frequency: max speed
+
+A&gt;sys clock 4000
+
+Frequency: 4000 kHz (4.0 MHz)
+
+A&gt;sys clock
+
+Frequency: 4000 kHz (4.0 MHz)
+
+A&gt;sys clock 12000
+
+Frequency: 12000 kHz (12.0 MHz)
+
+A&gt;sys clock 0
+
+Frequency: max speed
+
+A&gt;
+-------------------------------------------------------------------------------
+
+20. September 2020
+Andreas Gerlich
+(University of Ulm, Germany)
+
+<font size="+1">only text emails please: <img
+src="e_mail_yaze-ag.png" align="bottom"> (email of the project)</font>
+
+
+<a name="calcspeed">&nbsp;</a>
+<b>14. Calculation of the speed
+============================</b>
+
+On drive A: is the submit file "A:TESTZEX.SUB". This runs the Z80 core tester
+"ZEXALL.COM" and measure up the time how long it needs and then it calculates
+at the end the speed of the Z80 core.
+
+"ZEXALL.COM" needs 11569 seconds on a 4 MHz Z80. This is the basis for the
+calculation.
+
+28. July 2021
+Andreas Gerlich
+(University of Ulm, Germany)
+
+
+
+<a name="zsm4">&nbsp;</a>
+<b>15. ZSM4 Macro Assembler for Z80/Z180/Z280
+==========================================</b>
+
+Now, in this final release yaze-ag-2.51.3 is the free "ZSM4.COM" Macro Assembler
+the standard for assembling BOOTSYS.MAC and the BIOS3-Z80-files (*.MAC). The ZSM4-
+Assembler is written in Z80 Code, so it can assemble Z180- or Z280-files on a Z80
+system (or a Z80-Emulator). The ZSM4-Assembler runs also without any problem on
+my real Z280-System (called CPU280, created by Tilmann Reh, town Siegen in Germany).
+
+You find the project page at <a href="https://github.com/hperaza/ZSM4" target=_blank>https://github.com/hperaza/ZSM4</a>. The Assembler is
+created by Hector Peraza. The license is the GPLv2 (GNU General Public License
+Version 2, June 1991).
+
+The source files of this Assembler can be mounted on drive O:
+(yaze-ag disk file: zsm4-source.ydsk).
+
+January 1, 2022
+Andreas Gerlich
+(University of Ulm, Germany)
+
+
+<font size="+1">only text emails please: <img
+src="e_mail_yaze-ag.png" align="bottom"> (email of the project)</font>
+
+
+
+<a name="package">&nbsp;</a>
+<b>16. Following files are in the yaze-ag package (yaze-ag-2.51.3.tar.gz):
+=======================================================================</b>
+
+    <b>MD5 checksum</b>
+
+	md5_yaze-ag-2.20	The md5 checksum file of the final release
+				of version 2.20.
+				With this md5 checksum file you can check
+				all files.
+				Use "md5sum -c md5_yaze-ag-2.20" to check
+				all files (see "man md5sum").
+
+	md5_yaze-ag-2.12.1	The md5 checksum file of the final release
+				of version 2.12.1.
+
+    <b>Documentation (in doc/ and doc_html/)</b>
+
+	index.html		Click this file to read the documentaion.
+	00-INDEX.doc		A brief index of the documentation of yaze-ag
+	INSTALL-2.51.3		describes the install process of version 2.51.3
+	README-2.51.3		README to final release 2.51.3
+	yaze-ag.doc		The documentation <u>only</u> of the new features of
+				yaze-ag-2.51.3
+
+	yaze.1			Man page to yaze-ag
+	cdm.1			Man page to cdm (CP/M Disk Manager)
+
+	README_BIOS3_Z80	README of the CP/M 3.1 BIOS files (*.Z80)
+	README_BOOTSYS		README of the new CPM3.SYS loader BOOTSYS
+
+	README-1.10		README of the features of the old
+				version 1.06/1.10
+	yaze.doc                The documentation of the old
+				version 1.00 to 1.10
+
+    <b>Makefiles</b>
+
+	Makefile_solaris	Makefile for Solaris (copy it to Makefile)
+	Makefile_linux		Makefile for Linux   (copy it to Makefile)
+	Makefile_freebsd	Makefile for FreeBSD (copy it to Makefile)
+	Makefile_cygwin		Makefile for Cygwin  (copy it to Makefile)
+		(cygwin is a unix like enviroment for windows)
+
+    <b>The different modules</b> (I have made a lot of changes in all modules):
+
+	yaze.c		Source of the main (only this file is different to
+					    the pre release)
+	yaze.h		belonging to yaze.c
+
+	mem_mmu.c	Some definitions and routines for usage the emulated
+	(new)		MMU in YAZE-AG-2.30.2.
+
+	mem_mmu.h	The central definitions for memory access. All other
+	(new)		modules uses this definitions in dependence of -DMMU
+			if defined or not.
+
+	simz80.c	The Z80 interpreter. I made a lot of changes for
+			usage the MMU (over mem_mmu.h) because the memory
+			access goes over the interface macros GetBYTE, GetWORD
+			PutBYTE, PutWORD which are defined in mem_mmu.h. This
+			macros uses the selected MMU-table to manipulate the
+			Z80-memory.
+
+			BUT I DON'T CHANGE THE ALGORITHM OF ANY Z80 INSTRUC-
+			TION !!! I MADE THE CHANGES VERY CAREFULLY !!!
+
+			The test utilities zexall.com and zexdoc.com works
+			very well !!! Any instruction is OK !!!
+			(see above "Optimizing")
+
+	simz80_wts.c	The same as simz80.c, but "with t-states" of each Z80
+			intruction and the software extension to run the Z80
+			interpreter at a interaktive defined clock rate (see
+			"clock" command in the monitor).
+			This software extension is independent of the clock
+			rate of the host processor! It uses the real time clock
+			(RTC) of the Unix/Linux/Windows system.
+
+	simz80.h	Definitions of the Z80-Register and some fundamental
+			macros for simz80.c and other modules.
+
+	simz80.pl	If you want to experiment with the Z80-simulator you
+	(perl-file)	can use this file.
+			I have transfered all changes which I made
+			in simz80.c !!!
+			This perl-script produce a simz80.c with all changes
+			I made.
+
+	ybios.[ch]	The yaze-bios with CP/M 3.1 extensions. It uses also
+			GetBYTE, GetWORD, PutBYTE, PutWORD to manipulate the
+			Z80 memory.
+			The CP/M 3.1 extensions will be switched on if -DMMU
+			is defined in the Makefile.
+
+	monitor.c	The monitor for yaze-ag. 
+			Now you can mount/unmount disk files under CP/M 3.1.
+			You can mount/unmount UNIX directories to a CP/M
+			drive, too.
+
+	conin.c		The keytranslation module which is developed by
+	keytrans.c	Jon Saxton. With this module you can use e.g. the
+	ktt.h		cursor keys in the CP/M command line and if
+	keytest.c	Wordstar 4.00 (see drive A:) is running.
+	nulrq.c
+			
+			
+	yaze.boot	It contains Superdos a  CP/M 2.2 replacement. I take it
+			from yaze-1.10. It is used if -DBOOTSYS is NOT defined.
+			You can also boot Superdos (CP/M 2.2) with
+
+				<b>yaze -l -1 -b yaze.boot</b>
+
+
+	yaze-cpm3.boot	This file contains BOOTSYS + CPM3.SYS to start
+	(new)		CP/M 3.1.
+			If -DBOOTSYS is defined this file will be loaded at
+			0100H instead of yaze.boot (CP/M 2.2). It is the same
+			file like CPM3.COM on Drive A:. I transfer it to Unix/
+			Linux and name it yaze-cpm3.boot.
+			It will be generated under CP/M 3.1 by P:Y.SUB with
+
+				PIP CPM3.COM=BOOTSYS.COM,CPM3.SYS
+
+			(If -DMMU is not defined while -DBOOTSYS is defined
+			 yaze-ag will exit when the CP/M 3.1 bios starts and
+			 uses funtions for the MMU or CP/M 3.1 of the
+			 yaze-bios.)
+
+	.yazerc		The startup file for yaze-ag
+			(see above).
+
+	The other files are the same as in the yaze-1.10 distribution.
+
+
+
+    <b>yaze-DISK-Files which are defined in .yazerc:</b>
+
+	A: BOOT_UTILS.ydsk	BOOT disk with CCP.COM some ZINC- and other
+				utilities.
+				See 0-README.1ST for the contents of this drive.
+
+	B: CPM3_SYS.ydsk	Disk with all CP/M 3.1 utilities. The command
+				HELP.COM gives help to all CP/M 3.1 utilities.
+				(In the help file HELP.HLP I add the new
+				 section "YAZE-AG".)
+
+	C: ./disksort/		This drive is connected to the (unix-)sub-
+				directory ./disksort/ .
+				It contains the source files of the DISKSORT
+				project. (Look drive D:)
+
+	D: DISKSORT.ydsk	Contains the submit files and the make file to
+				compile the DISKSORT project.
+				This disk file will contain the compiled files
+				(*.rel and DISKSORT.COM) when you compile the
+				project. (Have a look to chapter
+				     <a href="#mounting_dir">7. Mounting directories with Time Stamps</a>)
+
+	F: ZINC.ydsk		A copy of the ZINC project from John Elliott
+
+	G: TEST-UTILS-1.10.ydsk	The test utilities of version yaze-1.10.
+				This test utilities test the Z80 simulator
+				(simz80.c). All changes in simz80.c are OK.
+
+	H: HI-C-Z280-Compiler.ydsk	A copy of the HI-C-Compiler. The 
+					Z280 Optimiser and Z280 Libs are from
+					Stefan Nitschke.
+
+	I: UNIXLIKE.ydsk	UNIX like utilities. See UTOOL*.MAN and the
+				*.DOC files.
+
+	J: MMU-Utils.ydsk	Here are some test utilties for the simulated
+				MMU in yaze-ag.
+				Use it only under CP/M 2.2 (yaze.boot) or
+				CP/M 3.1 will be crash. Only MMUPRINT does NOT
+				made any changes in the MMU, you can use it to
+				see the status of the MMU under CP/M 3.1 .
+				You start CP/M 2.2 with the options
+					yaze -l -1 -b yaze.boot
+
+	K: Kermit_SZRZ.ydsk	Communications software to use a serial line:
+				Kermit is a standard software. There
+				are versions for DOS and Windows. Under Windows
+				you can use HyperTerm.
+				SZ/RZ uses the Zmodem protocol.
+
+	L: spl.ydsk		SPL development environment to compile .SPL files.
+				SPL develops Peter Schorn in Switzerland.
+				The files YWRITE.SPL and YREAD.SPL are in this disk
+				which are compiled to A:W.COM and A:R.COM.
+
+	M: Turbo-Modula-2.ydsk	Modula 2 Compiler of Borland
+				Try the file BIRTHDAY.COM it makes some calculations
+				with your birthday. <img src="happy.gif" align="middle">
+
+	N: testdisk.ydsk	testdisk
+
+	O: zsm4-source.ydsk	ZSM4 Macro Assembler for Z80/Z180/Z280 (source)
+
+	P: bios3-zsm4.ydsk	The disks with which I developed the CP/M 3.1
+				bios which act as an interface to the yaze-bios.
+				There is also the source of BOOTSYS (Sorry the
+				comments are in the german language ;-)).
+				0-README.1ST declares the files containing
+				in this disks. It is the same file like
+				README_BIOS3_Z80.
+				There is also a copy of ZPM3N10.PMA.
+
+	On every disks are a file with the name 0-README.1ST. This file
+	describes the contents of the disk.
+
+<a name="optimizing">&nbsp;</a>
+<b>17. Optimizing and speedtest:
+=============================</b>
+
+	I made also some work for optimize in simz80.c.
+	If you compile yaze-ag-2.30.2 without -DMMU and
+	without -DBOOTSYS, yaze-ag-2.30.2 will be compiled
+	like the last yaze version (yaze-1.10) with only
+	64K and the default use of CP/M 2.2 (yaze.boot).
+
+	On my Notebook with 2,9 GHz (corei7)
+
+	  SAVAGE.COM needs:
+		yaze-2.30.3     0.265 secs (with MMU)
+		4.0MHz Z80     65.000 secs
+
+	  Zexall.com needs:
+		yaze-2.30.2    25.849 secs (with MMU)
+		4.0MHz Z80  11688.000 secs (reference, 3.25 h)
+
+	  That correlates rather a ~ 1808.65 MHz Z80 (with MMU)
+
+	On my 2,66 GHz Linux Server YAZE-AG runs like
+	a Z80 with 1.558 GHz ;-) (Zexall needs only 30 seconds against
+	3,25 hours on an original Z80 with 4 MHz!!!)
+	Thats very good to compile/develop software for the Z280 system :-)
+
+	(messured with unix command "time")
+
+<a name="old_z80system">&nbsp;</a>
+<b>18. My old real Z80 System:
+===========================</b>
+
+I have at home an old Z80 ECB-Bus-Sytem (4Mhz) (1982-1989). The terminal
+is an another ECB-BUS-Card and is it's own Z80-System with a CRT-Chip from
+Motorola. To the ECB-Bus it schows like a 8251 Intel Chip and it is very fast.
+
+For some ECB-Bus cards (CPU-, RAM-, Floppy-Card) of this system exists
+a CP/M 3.1 implementation of a german company, but I made a lot of extensions.
+So I add some ECB-Bus cards:
+	a RAM-disk with 1,2 MB,
+	an EPROM-Disk with 256 KB,
+	a CMOS-RAM-disk with 64KB and a battery (on this is CPM3.SYS),
+	an ECB-Bus-Card as a harddisk interface to an OMTI 5510 (IBM-XT
+	   HD controller) with an old 5 MB HD ;-) ,
+	and a Card with a clock.
+
+I made the bios extension succesive for this new 4 drives and the clock.
+
+I think I have through this work a lot of practise to develop a CP/M 3.1 bios
+and this contribute the development of the bios and yaze-bios of yaze-ag.
+
+
+--
+February 16, 2022
+Dipl.-Ing. (FH) Andreas Gerlich
+(University of Ulm,Germany)
+
+<font size="+1">only text emails please: <img
+src="e_mail_yaze-ag.png" align="middle"> (email of the project)</font>
+
+END of yaze-ag.doc
+<hr>
+<b>Look to the document <a href="yaze_doc.html">yaze.doc</a> for the other features (yaze-1.00).</b>
+
+</pre>
+</body>
+
+</html>
