@@ -66,12 +66,12 @@ extern FASTWORK simz80_with_tStates(FASTREG PC);
 #define TSTFLAG(f)	((AF & FLAG_ ## f) != 0)
 
 #define ldig(x)		((x) & 0xf)
-#define hdig(x)		(((x)>>4)&0xf)
-#define lreg(x)		((x)&0xff)
-#define hreg(x)		(((x)>>8)&0xff)
+#define hdig(x)		(((x) >> 4) & 0xf)
+#define lreg(x)		((x) & 0xff)
+#define hreg(x)		(((x) >> 8) & 0xff)
 
-#define Setlreg(x, v)	x = (((x)&0xff00) | ((v)&0xff))
-#define Sethreg(x, v)	x = (((x)&0xff) | (((v)&0xff) << 8))
+#define Setlreg(x, v)	x = (((x) & 0xff00) | ((v) & 0xff))
+#define Sethreg(x, v)	x = (((x) & 0xff) | (((v) & 0xff) << 8))
 
 /* SEE functions for manipulating of memory in mem_mmu.h 
       line RAM, GetBYTE, GetWORD, PutBYTE, PutWORD, .... 
@@ -85,5 +85,6 @@ extern void out(unsigned int, unsigned char);
 #else
 /* Define these as macros or functions if you really want to simulate I/O */
 #define Input(port)	0
+#define InputFF(port)	0xff
 #define Output(port, value)
 #endif

@@ -53,6 +53,31 @@ static const unsigned char partab[256] = {
 	4,0,0,4,0,4,4,0,0,4,4,0,4,0,0,4,
 };
 
+
+/* rotateShiftTable[i] = (i & 0xa8) | (((i & 0xff) == 0) << 6) | parityTable[i & 0xff], i = 0..255 */
+/*
+static const BYTE rotateShiftTable[256] = {
+     68,  0,  0,  4,  0,  4,  4,  0,  8, 12, 12,  8, 12,  8,  8, 12,
+      0,  4,  4,  0,  4,  0,  0,  4, 12,  8,  8, 12,  8, 12, 12,  8,
+     32, 36, 36, 32, 36, 32, 32, 36, 44, 40, 40, 44, 40, 44, 44, 40,
+     36, 32, 32, 36, 32, 36, 36, 32, 40, 44, 44, 40, 44, 40, 40, 44,
+      0,  4,  4,  0,  4,  0,  0,  4, 12,  8,  8, 12,  8, 12, 12,  8,
+      4,  0,  0,  4,  0,  4,  4,  0,  8, 12, 12,  8, 12,  8,  8, 12,
+     36, 32, 32, 36, 32, 36, 36, 32, 40, 44, 44, 40, 44, 40, 40, 44,
+     32, 36, 36, 32, 36, 32, 32, 36, 44, 40, 40, 44, 40, 44, 44, 40,
+    128,132,132,128,132,128,128,132,140,136,136,140,136,140,140,136,
+    132,128,128,132,128,132,132,128,136,140,140,136,140,136,136,140,
+    164,160,160,164,160,164,164,160,168,172,172,168,172,168,168,172,
+    160,164,164,160,164,160,160,164,172,168,168,172,168,172,172,168,
+    132,128,128,132,128,132,132,128,136,140,140,136,140,136,136,140,
+    128,132,132,128,132,128,128,132,140,136,136,140,136,140,140,136,
+    160,164,164,160,164,160,160,164,172,168,168,172,168,172,172,168,
+    164,160,160,164,160,164,164,160,168,172,172,168,172,168,168,172,
+};
+ * This Table is for test. It's not used in simz80.c
+*/
+
+
 extern bool rtc_avail;
 extern ui32 sim_os_msec();
 extern ui32 sim_os_ms_sleep(unsigned int milliseconds);
@@ -62,6 +87,35 @@ extern ui32 sim_os_ms_sleep(unsigned int milliseconds);
 #ifdef DEBUG
 volatile int stopsim;
 #endif
+
+
+/*  Macros for the IN/OUT instructions INI/INIR/IND/INDR/OUTI/OTIR/OUTD/OTDR
+
+    Pre condition
+        temp == value of register B at entry of the instruction
+        acu == value of transferred byte (IN or OUT)
+    Post condition
+        F is set correctly
+
+    Use INOUTFLAGS_ZERO(x) for INIR/INDR/OTIR/OTDR where
+        x == (C + 1) & 0xff for INIR
+        x == L              for OTIR and OTDR
+        x == (C - 1) & 0xff for INDR
+    Use INOUTFLAGS_NONZERO(x) for INI/IND/OUTI/OUTD where
+        x == (C + 1) & 0xff for INI
+        x == L              for OUTI and OUTD
+        x == (C - 1) & 0xff for IND
+*/
+#define INOUTFLAGS(syxz, x)                                             \
+    AF = (AF & 0xff00) | (syxz) |               /* SF, YF, XF, ZF   */  \
+        ((acu & 0x80) >> 6) |                           /* NF       */  \
+        ((acu + (x)) > 0xff ? (FLAG_C | FLAG_H) : 0) |  /* CF, HF   */  \
+        partab[((acu + (x)) & 7) ^ temp]                /* PF       */
+
+#define INOUTFLAGS_ZERO(x)      INOUTFLAGS(FLAG_Z, x)
+#define INOUTFLAGS_NONZERO(x)                                           \
+    INOUTFLAGS((hreg(BC) & 0xa8) | ((hreg(BC) == 0) << 6), x)
+
 
 #define POP(x)	do {							\
 	FASTREG y = RAM_pp(SP);						\
@@ -287,7 +341,7 @@ simz80_with_tStates(FASTREG PC)
 			(sum & 0x28) | (AF & 0xc4) | (temp & 1);
 		break;
 	case 0x10:			/* DJNZ dd */
-		/* ursprüngliche Zeile:
+		/* urspruengliche Zeile:
 		PC += ((BC -= 0x100) & 0xff00) ? (signed char) GetBYTE(PC) + 1 : 1;
 		*/
 		if ((BC -= 0x100) & 0xff00) {
@@ -2750,21 +2804,47 @@ simz80_with_tStates(FASTREG PC)
 			if ((sum & 15) == 8 && (cbits & 16) != 0)
 				AF &= ~8;
 			break;
+
+/*  SF, ZF, YF, XF flags are affected by decreasing register B, as in DEC B.
+    NF flag A is copy of bit 7 of the value read from or written to an I/O port.
+    INI/INIR/IND/INDR use the C flag in stead of the L register. There is a
+    catch though, because not the value of C is used, but C + 1 if it's INI/INIR
+ or
+    C - 1 if it's IND/INDR. So, first of all INI/INIR:
+        HF and CF Both set if ((HL) + ((C + 1) & 255) > 255)
+        PF The parity of (((HL) + ((C + 1) & 255)) & 7) xor B)                  
+    */
+
 		case 0xA2:			/* INI */
 			tStates += 16;
-			PutBYTE(HL, Input(lreg(BC))); ++HL;
-			SETFLAG(N, 1);
-			/* SETFLAG(P, (--BC & 0xffff) != 0); deleted */
-			Sethreg(BC, lreg(BC) - 1); /* added at 2019-03-23 */
-			SETFLAG(Z, lreg(BC) == 0); /* added at 2019-03-23 */
+			acu = InputFF(lreg(BC));
+			PutBYTE(HL, acu);
+			++HL;
+			temp = hreg(BC);
+			Sethreg(BC, hreg(BC) - 1);
+			INOUTFLAGS_NONZERO((lreg(BC) + 1) & 0xff);
 			break;
+
+/*  SF, ZF, YF, XF flags are affected by decreasing register B, as in DEC B.
+    NF flag A is copy of bit 7 of the value read from or written to an I/O port.
+    And now the for OUTI/OTIR/OUTD/OTDR instructions. Take state of the L
+    after the increment or decrement of HL; add the value written to the I/O port
+    to; call that k for now. If k > 255, then the CF and HF flags are set. The PF
+    flags is set like the parity of k bitwise and'ed with 7, bitwise xor'ed with B.
+    HF and CF Both set if ((HL) + L > 255)
+    PF The parity of ((((HL) + L) & 7) xor B)				*/
+
 		case 0xA3:			/* OUTI */
 			tStates += 16;
-			Output(lreg(BC), GetBYTE(HL)); ++HL;
-			SETFLAG(N, 1);
+			acu = GetBYTE(HL);
+			Output(lreg(BC), acu);
+			++HL;
+			temp = hreg(BC);
 			Sethreg(BC, hreg(BC) - 1);
-			SETFLAG(Z, hreg(BC) == 0);
+			INOUTFLAGS_NONZERO(lreg(HL));
 			break;
+
+
 		case 0xA8:			/* LDD */
 			tStates += 16;
 			acu = GetBYTE_mm(HL);
@@ -2786,20 +2866,38 @@ simz80_with_tStates(FASTREG PC)
 			if ((sum & 15) == 8 && (cbits & 16) != 0)
 				AF &= ~8;
 			break;
+
+
+/*  SF, ZF, YF, XF flags are affected by decreasing register B, as in DEC B.
+    NF flag A is copy of bit 7 of the value read from or written to an I/O port.
+    INI/INIR/IND/INDR use the C flag in stead of the L register. There is a
+    catch though, because not the value of C is used, but C + 1 if it's INI/INIR
+ or
+    C - 1 if it's IND/INDR. And last IND/INDR:
+        HF and CF Both set if ((HL) + ((C - 1) & 255) > 255)
+        PF The parity of (((HL) + ((C - 1) & 255)) & 7) xor B)                  
+    */
+
 		case 0xAA:			/* IND */
 			tStates += 16;
-			PutBYTE(HL, Input(lreg(BC))); --HL;
-			SETFLAG(N, 1);
-			Sethreg(BC, lreg(BC) - 1);
-			SETFLAG(Z, lreg(BC) == 0);
+			acu = InputFF(lreg(BC));
+			PutBYTE(HL, acu);
+			--HL;
+			temp = hreg(BC);
+			Sethreg(BC, hreg(BC) - 1);
+			INOUTFLAGS_NONZERO((lreg(BC) - 1) & 0xff);
 			break;
+
 		case 0xAB:			/* OUTD */
 			tStates += 16;
-			Output(lreg(BC), GetBYTE(HL)); --HL;
-			SETFLAG(N, 1);
+			acu = GetBYTE(HL);
+			Output(lreg(BC), acu);
+			--HL;
+			temp = hreg(BC);
 			Sethreg(BC, hreg(BC) - 1);
-			SETFLAG(Z, hreg(BC) == 0);
+			INOUTFLAGS_NONZERO(lreg(HL));
 			break;
+
 		case 0xB0:			/* LDIR */
 			tStates -= 5;;
 			acu = hreg(AF);
@@ -2834,28 +2932,39 @@ simz80_with_tStates(FASTREG PC)
 			if ((sum & 15) == 8 && (cbits & 16) != 0)
 				AF &= ~8;
 			break;
+
 		case 0xB2:			/* INIR */
 			tStates -= 5;
 			temp = hreg(BC);
+			if (temp == 0)
+				temp = 0x100;
 			do {
 				tStates += 21;
-				PutBYTE(HL, Input(lreg(BC))); ++HL;
+				acu = InputFF(lreg(BC));
+				PutBYTE(HL, acu);
+				++HL;
 			} while (--temp);
+			temp = hreg(BC);
 			Sethreg(BC, 0);
-			SETFLAG(N, 1);
-			SETFLAG(Z, 1);
+			INOUTFLAGS_ZERO((lreg(BC) + 1) & 0xff);
 			break;
+
 		case 0xB3:			/* OTIR */
 			tStates -= 5;
 			temp = hreg(BC);
+			if (temp == 0)
+				temp = 0x100;
 			do {
 				tStates += 21;
-				Output(lreg(BC), GetBYTE(HL)); ++HL;
+				acu = GetBYTE(HL);
+				Output(lreg(BC), acu);
+				++HL;
 			} while (--temp);
+			temp = hreg(BC);
 			Sethreg(BC, 0);
-			SETFLAG(N, 1);
-			SETFLAG(Z, 1);
+			INOUTFLAGS_ZERO(lreg(HL));
 			break;
+
 		case 0xB8:			/* LDDR */
 			tStates -= 5;
 			BC &= 0xffff;
@@ -2893,27 +3002,36 @@ simz80_with_tStates(FASTREG PC)
 		case 0xBA:			/* INDR */
 			tStates -= 5;
 			temp = hreg(BC);
+			if (temp == 0)
+				temp = 0x100;
 			do {
 				tStates += 21;
-				PutBYTE(HL, Input(lreg(BC))); --HL;
+				acu = InputFF(lreg(BC));
+				PutBYTE(HL, acu);
+				--HL;
 			} while (--temp);
+			temp = hreg(BC);
 			Sethreg(BC, 0);
-			SETFLAG(N, 1);
-			SETFLAG(Z, 1);
+			INOUTFLAGS_ZERO((lreg(BC) - 1) & 0xff);
 			break;
+
 		case 0xBB:			/* OTDR */
 			tStates -= 5;
 			temp = hreg(BC);
+			if (temp == 0)
+				temp = 0x100;
 			do {
 				tStates += 21;
-				Output(lreg(BC), GetBYTE(HL));
+				acu = GetBYTE(HL);
+				Output(lreg(BC), acu);
 				--HL;
 			} while (--temp);
+			temp = hreg(BC);
 			Sethreg(BC, 0);
-			SETFLAG(N, 1);
-			SETFLAG(Z, 1);
+			INOUTFLAGS_ZERO(lreg(HL));
 			break;
-		default: if (0x40 <= op && op <= 0x7f) PC--;		/* ignore ED */
+
+		default: if (0x40 <= op && op <= 0x7f) PC--;	/* ignore ED */
 		}
 		break;
 	case 0xEE:			/* XOR nn */

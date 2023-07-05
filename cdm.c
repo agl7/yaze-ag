@@ -1016,7 +1016,7 @@ docreate(char *tok)
 
 /* Close out an extent.  Must be called with valid cf values */
 static void
-trunc(CFILE *cf)
+trunc_cf(CFILE *cf)
 {
     int lex = cf->pos/(16*1024);	/* logical extent */
 
@@ -1072,7 +1072,7 @@ copycc(char *fn1, char *fn0)
 	    continue;
 	}
 	if (cf[0].pos != cf[1].pos)
-	    trunc(&cf[0]);
+	    trunc_cf(&cf[0]);
 	cf[0].pos = cf[1].pos;
 	switch (getblock(&cf[0], 1)) {
 	case 0:
@@ -1090,7 +1090,7 @@ copycc(char *fn1, char *fn0)
 	cf[1].pos += minlen;
 	cf[0].pos += minlen;
     }
-    trunc(&cf[0]);
+    trunc_cf(&cf[0]);
 }
 
 static int
@@ -1147,7 +1147,7 @@ copyuc(char *fn1, char *fn0)
     fclose(uf);
     while (cf.pos & 0x7f)
 	putcpm(0x1a, &cf);
-    trunc(&cf);
+    trunc_cf(&cf);
 }
 
 /* copy CP/M file to unix file

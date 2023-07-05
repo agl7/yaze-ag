@@ -320,8 +320,8 @@ main(int argc, char **argv)
     puts("\nYet Another Z80 Emulator by AG, "
 	"\033[32m"
 
-	"final release " VERSION 
-/*	"development v" VERSION "-" DEVVER "_beta" */
+/*	"final release " VERSION  */
+	"development version " VERSION "-" DEVVER 
 /*	"release candidate " VERSION "-" DEVVER */
 
 	"\033[0m"

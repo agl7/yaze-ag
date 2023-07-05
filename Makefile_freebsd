@@ -1,65 +1,21 @@
 # Makefile for yaze-ag
 
-BUILD = " (build for AMD (barcelona, 64Bit))"
+BUILD = " (generic POSIX build)"
 
 # CC must be an ANSI-C compiler
-CC            =	clang
+CC            =	cc
+
+PREFIX        = /usr/local
 
 #where you want the binaries and manual page
-BINDIR	      = /usr/local/bin
-MANDIR	      = /usr/local/man/man1
-LIBDIR	      = /usr/local/lib/yaze
+BINDIR	      = $(PREFIX)/bin
+MANDIR	      = $(PREFIX)/share/man/man1
+LIBDIR	      = $(PREFIX)/lib/yaze
 DSKDIR        = $(LIBDIR)/disks
 DOCDIR        = $(LIBDIR)/doc
 DOCHTMLDIR    = $(LIBDIR)/doc_html
 
-#OPTIMIZE	= -g -m486
-#OPTIMIZE	= -g -save-temps -m486
-# OPTIMIZE	=
-# OPTIMIZE	= -O1
-# OPTIMIZE	= -O2
-# OPTIMIZE	= -O2 -save-temps
-# OPTIMIZE	= -O2 -save-temps -m486
-
-# optimizing with gcc 2.x.x
-#OPTIMIZE	= -O3 -m486
-
-# optimizing with gcc 3.x.x
-# (please search for your processor in "man gcc")
-# (tip: search first for "pentium3")
-#
-# -march=cpu-type
-#	Tune to cpu-type everything applicable about the gen-
-#	erated code, except for the ABI and the set of avail-
-#	able instructions.  The choices for cpu-type are i386,
-#	i486, i586, i686, pentium, pentium-mmx, pentiumpro,
-#	pentium2, pentium3, pentium4, k6, k6-2, k6-3, athlon,
-#	athlon-tbird, athlon-4, athlon-xp, athlon-mp,
-#	winchip-c6, winchip2 and c3.
-#
-#OPTIMIZE	= -O3 -march=i386
-#OPTIMIZE	= -O3 -march=i486
-#OPTIMIZE	= -O3 -march=i586
-#OPTIMIZE	= -O3 -march=i686
-#OPTIMIZE	= -O3 -march=pentium
-#OPTIMIZE	= -O3 -march=pentium-mmx
-#OPTIMIZE	= -O3 -march=pentiumpro
-#OPTIMIZE	= -O3 -march=pentium2
-#OPTIMIZE	= -O3 -march=pentium3
-#OPTIMIZE	= -O3 -march=pentium4
-#OPTIMIZE	= -O3 -march=nocona	# 64 Bit Intel
-#OPTIMIZE	= -O3 -march=k6
-#OPTIMIZE	= -O3 -march=k6-2
-#OPTIMIZE	= -O3 -march=k6-3
-#OPTIMIZE	= -O3 -march=athlon
-#OPTIMIZE	= -O3 -march=athlon-tbird
-#OPTIMIZE	= -O3 -march=athlon-4
-#OPTIMIZE	= -O3 -march=athlon-xp
-#OPTIMIZE	= -O3 -march=athlon-mp
-#OPTIMIZE	= -O3 -march=athlon64	# 64 Bit AMD
-#OPTIMIZE	= -O3 -march=athlon64-sse3
-#OPTIMIZE	= -O3 -march=barcelona
-OPTIMIZE	= -O3 -march=x86-64
+OPTIMIZE	= -O3
 
 # -DUSE_GNU_READLINE for command recall/editing and filename completion
 # -DBGii_BUG works around a problem in Backgrounder II
@@ -105,9 +61,9 @@ OPTIMIZE	= -O3 -march=x86-64
 #
 # --
 # solaris2, freebsd and cygwin needs -D__EXTENSIONS__
-# linux needs -D_BSD_SOURCE
+# linux needs -D_DEFAULT_SOURCE
 #
-OPTIONS	= -DBIOS -D__EXTENSIONS__ -DMMU -DBOOTSYS -DMULTIO # -DSHOWDRV
+OPTIONS	= -D_DEFAULT_SOURCE -D__EXTENSIONS__ -DBIOS -DMMU -DBOOTSYS -DMULTIO # -DSHOWDRV
 
 # Link with CP/M BIOS support,
 YAZE_OBJS     = yaze.o mem_mmu.o simz80.o simz80_wts.o ytimer.o ybios.o \
@@ -154,7 +110,9 @@ TEST	      =	test/prelim.z80 test/zexlax.pl test/zexall.z80 test/zexdoc.z80 \
 		test/timex.com \
 		TODO test.c md5 md5_V1.10 di
 
-DISTRIB       =	Makefile_linux_32_i586 \
+DISTRIB       =	Makefile_Linux \
+		Makefile_freebsd \
+		Makefile_linux_32_i586 \
 		Makefile_linux_64_amd_athlon64 \
 		Makefile_linux_64_intel_corei7 \
 		Makefile_linux_64_intel_nocona \
@@ -164,7 +122,6 @@ DISTRIB       =	Makefile_linux_32_i586 \
 		Makefile_solaris_cc-x86_64 \
 		Makefile_solaris_gcc-sparcv9 \
 		Makefile_solaris_gcc-x86_64 \
-		Makefile_freebsd \
 		Makefile Makefile_first \
 		Makefile_cygwin_32 \
 		Makefile_cygwin_64_core2duo \
@@ -184,7 +141,7 @@ DISTRIB       =	Makefile_linux_32_i586 \
 		.minttyrc md5summer.exe metapad.exe metapad.ini \
 		simz80.pl .yazerc yaze.boot $(SRCS) $(DOC) \
 		yaze-cpm3_80-columns_46-lines.boot \
-		yaze.sh doc_ydskfiles.txt doc_ydskfiles_windows.txt \
+		yaze.in doc_ydskfiles.txt doc_ydskfiles_windows.txt \
 		install_disks.sh \
 		bios3.ydsk yaze-cpm3.boot \
 		BOOT_UTILS.ydsk BOOT_UTILS_windows.ydsk testdsk.ydsk \
@@ -199,7 +156,11 @@ DISTRIB       =	Makefile_linux_32_i586 \
 
 all:		yaze_bin cdm keytest
 
-yaze_bin:	$(YAZE_OBJS)
+yaze.sh:        yaze.in
+		sed "s,@LIBDIR@,"$(LIBDIR)"," < $< > $@
+		chmod +x $@
+
+yaze_bin:	yaze.sh $(YAZE_OBJS)
 		$(CC) $(CFLAGS) $(YAZE_OBJS) $(LIBS) -o $@
 		ln -f -s yaze.sh yaze
 
@@ -215,30 +176,26 @@ cdm:		cdm.o
 		$(CC) $(CFLAGS) cdm.o $(LIBS) -o $@
 
 install:	all
-		rm -rf $(LIBDIR)
-		mkdir -p $(LIBDIR)
-		mkdir -p $(MANDIR)
-		$(INSTALL) -s -c -m 755 yaze_bin $(BINDIR)
-		$(INSTALL) -s -c -m 755 cdm $(BINDIR)
-		$(INSTALL) -c -m 755 yaze $(BINDIR)
-		ln -f -s $(BINDIR)/yaze $(BINDIR)/cpm
-		ln -f -s $(BINDIR)/yaze $(BINDIR)/z80
-		$(INSTALL) -c -m 644 yaze-cpm3.boot $(LIBDIR)
-		$(INSTALL) -c -m 644 yaze.boot $(LIBDIR)
-		$(INSTALL) -c -m 644 m2.ktt $(LIBDIR)
-		$(INSTALL) -c -m 644 sample.ktt $(LIBDIR)
-		$(INSTALL) -c -m 644 yaze.ktt $(LIBDIR)
-		$(INSTALL) -c -m 644 yaze.1 $(MANDIR)
-		$(INSTALL) -c -m 644 cdm.1 $(MANDIR)
-		$(INSTALL) -c -m 644 cpm.1 $(MANDIR)
-		$(INSTALL) -c -m 644 z80.1 $(MANDIR)
-		/bin/sh install_disks.sh $(DSKDIR)
-		/bin/sh install_doc.sh $(DOCDIR)
-		/bin/sh install_doc_html.sh $(DOCHTMLDIR)
-		(cd $(LIBDIR); \
-		rm -f md5 /tmp/md5.yaze-ag; \
-		find . -type f -exec md5sum -b {} >>/tmp/md5.yaze-ag \; ; \
-		mv /tmp/md5.yaze-ag md5)
+		mkdir -p $(DESTDIR)$(LIBDIR)
+		mkdir -p $(DESTDIR)$(MANDIR)
+		mkdir -p $(DESTDIR)$(MANDIR)
+		$(INSTALL) -s -c -m 755 yaze_bin $(DESTDIR)$(BINDIR)
+		$(INSTALL) -s -c -m 755 cdm $(DESTDIR)$(BINDIR)
+		$(INSTALL) -c -m 755 yaze $(DESTDIR)$(BINDIR)
+		ln -f -s ./yaze $(DESTDIR)$(BINDIR)/cpm
+		ln -f -s ./yaze $(DESTDIR)$(BINDIR)/z80
+		$(INSTALL) -c -m 644 yaze-cpm3.boot $(DESTDIR)$(LIBDIR)
+		$(INSTALL) -c -m 644 yaze.boot $(DESTDIR)$(LIBDIR)
+		$(INSTALL) -c -m 644 m2.ktt $(DESTDIR)$(LIBDIR)
+		$(INSTALL) -c -m 644 sample.ktt $(DESTDIR)$(LIBDIR)
+		$(INSTALL) -c -m 644 yaze.ktt $(DESTDIR)$(LIBDIR)
+		$(INSTALL) -c -m 644 yaze.1 $(DESTDIR)$(MANDIR)
+		$(INSTALL) -c -m 644 cdm.1 $(DESTDIR)$(MANDIR)
+		$(INSTALL) -c -m 644 cpm.1 $(DESTDIR)$(MANDIR)
+		$(INSTALL) -c -m 644 z80.1 $(DESTDIR)$(MANDIR)
+		/bin/sh install_disks.sh $(DESTDIR)$(DSKDIR)
+		/bin/sh install_doc.sh $(DESTDIR)$(DOCDIR)
+		/bin/sh install_doc_html.sh $(DESTDIR)$(DOCHTMLDIR)
 
 md5:		$(DISTRIB)
 		(P=`pwd`; D=`basename $$P`; \
@@ -266,7 +223,7 @@ tar:		$(DISTRIB) md5
 
 clean:;		rm -f *.o *~ core
 		rm -f *.i *.s
-		rm -f yaze
+		rm -f yaze yaze.sh
 
 yaze.o:		yaze.c simz80.h yaze.h mem_mmu.h ytypes.h
 ybios.o:	ybios.c simz80.h yaze.h ybios.h mem_mmu.h ytypes.h ktt.h

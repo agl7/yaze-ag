@@ -152,6 +152,8 @@ extern struct mnt {		/* mount table (simulated drives A..P) */
     BYTE buf[128];	/*agl*/ /* Buffer of the first 128-Byte-Sektor of
 				   the diskfile - the discriptor page */
 
+    size_t doffs;	/*agl*/ /* data offset 03.07.2023 */
+
     BYTE *data;			/* disk image (if the mounted disk is a unix
 				   directory this pointer points to the
 				   simulated cp/m - directory) */

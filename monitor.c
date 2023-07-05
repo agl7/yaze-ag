@@ -18,6 +18,11 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. */
 
+#ifdef __sun__
+/* ancient sparc machines need this to get the proper stat.h macros, like S_IFMT */
+#define __EXTENSIONS__
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -342,13 +347,8 @@ cpmsize(const char *dir_name, const char *filename, unsigned char *cpmname,
         return 0;
     }
     close(fd);
-#ifdef __EXTENSIONS__
     if (((st.st_mode & S_IFMT) != S_IFREG) || st.st_size == 0)
     {
-#else
-    if (((st.st_mode & __S_IFMT) != __S_IFREG) || st.st_size == 0)
-    {
-#endif
         free(path);
         return 0;
     }
@@ -783,14 +783,8 @@ mount(int disk, const char *filename, int readonly)
         return 0;
     }
 
-#ifdef __EXTENSIONS__
     if ((st.st_mode & S_IFMT) == S_IFDIR)
     {
-#else
-    if ((st.st_mode & __S_IFMT) == __S_IFDIR)
-    {
-#endif
-
         if ((r = mountdir(dp, filename, lbl))
                 && cpm3)
             /* if (cpm3) */
@@ -798,13 +792,8 @@ mount(int disk, const char *filename, int readonly)
         return r;
     }
 
-#ifdef __EXTENSIONS__
     if ((st.st_mode & S_IFMT) != S_IFREG)
     {
-#else
-    if ((st.st_mode & __S_IFMT) != __S_IFREG)
-    {
-#endif
 
         fprintf(stderr, "%s is neither a regular file nor a directory\n", filename);
         return 0;
@@ -843,7 +832,8 @@ mount(int disk, const char *filename, int readonly)
         {
             dp->buf[sizeof(sssd)]   = 0;	/* psh = 0 */ /* added 27.3.2005 */
             dp->buf[sizeof(sssd) + 1] = 0;	/* phm = 0 */
-            dp->xlt = 1;		/* look to setup_cpm3_dph_dpb() in bios.c */
+	    dp->isize = 256256;
+            dp->xlt = 1;		/* look to setup_cpm3_dph_dpb() in ybios.c */
         }
         else
         {
@@ -940,7 +930,7 @@ mount(int disk, const char *filename, int readonly)
     dp->header = mmap(NULL, dp->isize, prot, MAP_FILE | MAP_SHARED, dp->ifd, 0);
 #else
     if ((dp->header = mmap(NULL, dp->isize, prot, MAP_FILE | MAP_SHARED,
-                           dp->ifd, 0)) == (char *) - 1)
+                           dp->ifd, 0)) == MAP_FAILED)
     {
         perror(filename);
         close(dp->ifd);
@@ -950,6 +940,9 @@ mount(int disk, const char *filename, int readonly)
     dp->filename = newstr(filename);
     dp->data = (BYTE *) dp->header + doffs;
     dp->flags |= MNT_ACTIVE;
+
+/*    fprintf(stderr,"\nmount: doffs: %d\n",doffs); */
+    dp->doffs = doffs;
 
     return 1;
 }
@@ -1526,7 +1519,8 @@ dotime(char *cmd)
 }
 
 
-#define	reference 46276.0 /* Konstante aus 11569 sec * 4 MHz (Referenz) */
+/* #define reference 46276.0 \* Konstante aus 11569 sec * 4 MHz (Referenz mit zexall.com) */
+#define	reference 52736.80 /* Konstante aus 13184.200 sec * 4 MHz (Referenz mit exz80all.com) */
 
 double t, mhz;
 
@@ -1541,7 +1535,7 @@ void timexprint()
 	    printf("Time ist 0.0 second!\n");
 	} else {
 	    mhz = reference / t;
-	    printf("\nTime of zexall is %.3f seconds!\r\n",t);
+	    printf("\nTime of exz80all is %.3f seconds!\r\n",t);
 	    printf("That is like a Z80 with %.3f MHz (%.3f GHz).\r\n",
 			mhz,mhz/1000.0);
 	}

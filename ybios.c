@@ -701,7 +701,8 @@ readsec(int sec_cnt)
 readsec(void)
 #endif
 {
-    unsigned long offset, blockno;
+    unsigned long blockno;
+    size_t offset;
     BYTE buf[128];
 #ifdef MMU
     FASTREG tmp2;
@@ -724,6 +725,22 @@ readsec(void)
         /* offset = (track*GetWORD(curdisk->dph+16) + sector)*128; */
         offset = (track * GetWORD(curdisk->dpb) + sector) * 128;
 
+    if ( (offset + curdisk->doffs) > curdisk->isize ) {
+	fprintf(stderr,"\r\nyaze read error: illegal disk access @ offset %lu"
+			" curdisk->maxoffset %lu\r\n",
+			(size_t) offset,
+			(size_t) curdisk->isize );
+	exit(1); /* leave yaze-ag */
+    }
+/*    else {
+	fprintf(stderr,"\r\nread: offset+doffs %lu  curdisk->doffs %lu  "
+			"curdisk->isize %lu  sec_cnt %d\r\n",
+			(size_t) offset + curdisk->doffs,
+			(size_t) curdisk->doffs,
+			(size_t) curdisk->isize,
+			(int) sec_cnt );
+    }
+*/
     if ((curdisk->flags & MNT_UNIXDIR) == 0)
     {
         /* the 'disk image' case is easy */
@@ -867,6 +884,7 @@ writesec(int stype)
 #ifdef MMU
     FASTREG tmp2;
 #endif
+    size_t offset;
 
     if (curdisk == NULL ||
             ((curdisk->flags & (MNT_ACTIVE | MNT_RDONLY)) != MNT_ACTIVE))
@@ -878,33 +896,85 @@ writesec(int stype)
         memcpy_get_z(curdisk->data + (track*GetWORD(curdisk->dph+16)+sector)*128,
     	 dma, 128);
     */
+
     if (cpm3)
     {
+	offset = (track * GetWORD(curdisk->dpb)
+		  + (sector << curdisk->psh)) * 128;
+
+	if ( (offset + curdisk->doffs) > curdisk->isize ) {
+		fprintf(stderr,"\r\nyaze write error: illegal disk access @ offset %lu"
+			" curdisk->maxoffset %lu\r\n",
+			(size_t) offset,
+			(size_t) curdisk->isize );
+		exit(1); /* leave yaze-ag */
+	}
+/*	else {
+		fprintf(stderr,"\r\nwrite: offset+doffs %lu  curdisk->doffs %lu  "
+			"curdisk->isize %lu\r\n",
+			(size_t) offset + curdisk->doffs,
+			(size_t) curdisk->doffs,
+			(size_t) curdisk->isize );
+	}
+*/
+
 #ifdef MULTIO
-        memcpy_M_get_z(dmmu,
-                       curdisk->data + (track * GetWORD(curdisk->dpb)
-                                        + (sector << curdisk->psh)) * 128,
-                       dma,
-                       (128 << curdisk->psh) * sec_cnt);
+/*
+	memcpy_M_get_z(dmmu,
+			curdisk->data + (track * GetWORD(curdisk->dpb)
+					 + (sector << curdisk->psh)) * 128,
+			dma,
+			(128 << curdisk->psh) * sec_cnt);
+*/
+	memcpy_M_get_z(dmmu,
+			curdisk->data + offset,
+			dma,
+			(128 << curdisk->psh) * sec_cnt);
 #else
-        memcpy_M_get_z(dmmu,
-                       curdisk->data + (track * GetWORD(curdisk->dpb)
-                                        + (sector << curdisk->psh)) * 128,
-                       dma,
-                       (128 << curdisk->psh));
+/*
+	memcpy_M_get_z(dmmu,
+			curdisk->data + (track * GetWORD(curdisk->dpb)
+					 + (sector << curdisk->psh)) * 128,
+			dma,
+			(128 << curdisk->psh));
+*/
+	memcpy_M_get_z(dmmu,
+			curdisk->data + offset,
+			dma,
+			(128 << curdisk->psh));
 #endif
+    } else { /* not cpm3 */
+
+	offset = (track * GetWORD(curdisk->dpb) + sector) * 128;
+
+	if ( (offset + curdisk->doffs) > curdisk->isize ) {
+		fprintf(stderr,"\r\nyaze write error: illegal disk access @ offset %lu"
+			" curdisk->maxoffset %lu\r\n",
+			(size_t) offset,
+			(size_t) curdisk->isize );
+		exit(1); /* leave yaze-ag */
+	}
+/*	else {
+		fprintf(stderr,"\r\nwrite offset+doffs %lu  curdisk->doffs %lu  "
+			"curdisk->isize %lu\r\n",
+			(size_t) offset + curdisk->doffs,
+			(size_t) curdisk->doffs,
+			(size_t) curdisk->isize );
+	}
+*/
+
+/*
+	memcpy_M_get_z(dmmu,
+			curdisk->data + (track * GetWORD(curdisk->dpb) + sector) * 128,
+			dma,
+			128);
+*/
+	memcpy_M_get_z(dmmu,
+			curdisk->data + offset,
+			dma,
+			128);
+
     }
-    else
-        /**********************
-            memcpy_M_get_z(dmmu,
-        	curdisk->data + (track*GetWORD(curdisk->dph+16) + sector)*128,
-        	dma,
-        	128);
-        ***********************/
-        memcpy_M_get_z(dmmu,
-                       curdisk->data + (track * GetWORD(curdisk->dpb) + sector) * 128,
-                       dma,
-                       128);
     return 0;
 }
 
@@ -933,6 +1003,8 @@ setup_cpm3_dph_dpb(int disk)
 {
     struct mnt *dp = mnttab + disk;
     WORD   w, ww;
+    size_t x, y, tracks;
+    /* float  r; */
     BYTE   version = dp->buf[16]; /* get version indentifier */
 #ifdef MMU
     FASTREG tmp2;
@@ -988,10 +1060,26 @@ setup_cpm3_dph_dpb(int disk)
     if (!(dp->flags & MNT_UNIXDIR))    /* only if NOT UNIXDIR */
     {
         /* calculate memory requirement */
-        /* (((DSM+1)<<BSH) + OFFS*SPT + 1)*128 */
-        dp->isize = (((GetWORD(dp->dpb + DPB_dsm) + 1) << GetBYTE(dp->dpb + DPB_bsh))
-                     + GetWORD(dp->dpb + DPB_off) * GetWORD(dp->dpb + DPB_spt) + 1)
-                    * 128;
+/*	r = (float)((GetWORD(dp->dpb + DPB_dsm) + 1) << GetBYTE(dp->dpb + DPB_bsh))
+			/ (float)GetWORD(dp->dpb + DPB_spt);
+	fprintf(stderr,"\r\nsetup_cpm3_dph_dpb: r %f\r\n",r);
+*/
+	x = ((GetWORD(dp->dpb + DPB_dsm) + 1) << GetBYTE(dp->dpb + DPB_bsh));
+	y = GetWORD(dp->dpb + DPB_spt);
+/*	fprintf(stderr,"\r\nsetup_cpm3_dph_dpb: RecordPerDisc %lu  "
+			"SektorsPerTrack %lu\r\n",x,y);
+*/
+	tracks = x / y + ( x % y ? 1 : 0 );
+/*	fprintf(stderr,"\r\nsetup_cpm3_dph_dpb: Tracks %lu\r\n",tracks); */
+
+	dp->isize = tracks + GetWORD(dp->dpb + DPB_off);
+
+/*	fprintf(stderr,"\r\nsetup_cpm3_dph_dpb: Tracks + reservedTracks %lu\r\n",
+			dp->isize);
+*/
+	/* dp->isize = dp->isize * GetWORD(dp->dpb + DPB_spt) * 128; */
+	dp->isize = (dp->isize * GetWORD(dp->dpb + DPB_spt)) << 7;
+/*	fprintf(stderr,"\r\nsetup_cpm3_dph_dpb: dp->isize %lu\r\n",dp->isize); */
     }
 }
 

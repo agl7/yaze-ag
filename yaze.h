@@ -18,11 +18,11 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. */
 
-#define VERSION "2.51.3"
-#define	DEVVER	"04"		/* developer version	*/
+#define VERSION "2.51.4"
+#define	DEVVER	"08"		/* developer version	*/
 #define MAINVersion	0x02
 #define SUBVersion	0x51
-#define DEVELVersion	0
+#define DEVELVersion	1
 
 /* #define	DEVVER	"RC4"	\* release candidate */
 /* Now it is in the Makefiles
